@@ -1,0 +1,12 @@
+.idea/
+node_modules/
+dist/
+.nuxt/
+.output/
+.env
+coverage/
+*.log
+.DS_Store
+
+# Deployment (kept local)
+deploy/

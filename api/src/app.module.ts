@@ -1,0 +1,21 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
+import { HealthController } from './health/health.controller';
+import { IotaModule } from './iota/iota.module';
+import { SnapshotModule } from './snapshot/snapshot.module';
+import { EcosystemModule } from './ecosystem/ecosystem.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27019/scanner'),
+    ScheduleModule.forRoot(),
+    IotaModule,
+    SnapshotModule,
+    EcosystemModule,
+  ],
+  controllers: [HealthController],
+})
+export class AppModule {}

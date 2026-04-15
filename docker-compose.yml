@@ -1,0 +1,40 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: scanner-mongodb
+    ports:
+      - "27019:27017"
+    volumes:
+      - scanner-mongodb-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  api:
+    build:
+      context: ./api
+    container_name: scanner-api
+    ports:
+      - "3004:3004"
+    environment:
+      MONGODB_URI: mongodb://scanner-mongodb:27017/scanner
+      PORT: "3004"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  website:
+    build:
+      context: ./website
+    container_name: scanner-website
+    ports:
+      - "3000:3000"
+    environment:
+      NUXT_PUBLIC_API_BASE: http://localhost:3004/api/v1
+    depends_on:
+      - api
+
+volumes:
+  scanner-mongodb-data:
