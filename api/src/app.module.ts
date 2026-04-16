@@ -11,7 +11,7 @@ import { EcosystemModule } from './ecosystem/ecosystem.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27019/scanner'),
-    ScheduleModule.forRoot(),
+    ...(process.env.NODE_ENV === 'test' ? [] : [ScheduleModule.forRoot()]),
     IotaModule,
     SnapshotModule,
     EcosystemModule,

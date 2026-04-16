@@ -6,6 +6,8 @@ dist/
 .env
 coverage/
 *.log
+test-results/
+playwright-report/
 .DS_Store
 
 # Deployment (kept local)

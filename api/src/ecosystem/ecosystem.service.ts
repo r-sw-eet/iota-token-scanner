@@ -41,6 +41,7 @@ export class EcosystemService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    if (process.env.NODE_ENV === 'test') return;
     const count = await this.ecoModel.countDocuments();
     if (count === 0) {
       this.logger.log('No ecosystem snapshot found, capturing in background...');
