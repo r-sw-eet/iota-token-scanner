@@ -582,11 +582,19 @@ const projectStorageChartOptions = {
 
       <!-- === FOOTER === -->
       <footer class="border-t border-scanner-border pt-6 mt-10">
-        <p class="text-xs text-[#52525b]">Data: api.mainnet.iota.cafe (JSON-RPC), graphql.mainnet.iota.cafe (GraphQL)</p>
-        <p class="text-xs text-[#52525b] mt-1">Epoch {{ snapshot.epoch }} &middot; Checkpoint {{ formatCompact(snapshot.checkpointCount) }} &middot; Updated {{ new Date(snapshot.timestamp).toLocaleString() }}</p>
-        <div class="mt-3 flex gap-4">
-          <NuxtLink to="/imprint" class="text-xs text-[#52525b] hover:text-scanner-accent transition-colors">Imprint</NuxtLink>
-          <NuxtLink to="/privacy" class="text-xs text-[#52525b] hover:text-scanner-accent transition-colors">Privacy</NuxtLink>
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div>
+            <p class="text-xs text-[#52525b]">Data: api.mainnet.iota.cafe (JSON-RPC), graphql.mainnet.iota.cafe (GraphQL)</p>
+            <p class="text-xs text-[#52525b] mt-1">Epoch {{ snapshot.epoch }} &middot; Checkpoint {{ formatCompact(snapshot.checkpointCount) }} &middot; Updated {{ new Date(snapshot.timestamp).toLocaleString() }}</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <a href="https://github.com/r-sw-eet/iota-trade-scanner" target="_blank" rel="noopener" class="flex items-center gap-1.5 text-sm text-[#52525b] hover:text-scanner-accent transition-colors">
+              <FontAwesomeIcon :icon="['fab', 'github']" class="w-4 h-4" aria-hidden="true" />
+              GitHub
+            </a>
+            <NuxtLink to="/imprint" class="text-sm text-[#52525b] hover:text-scanner-accent transition-colors">Imprint</NuxtLink>
+            <NuxtLink to="/privacy" class="text-sm text-[#52525b] hover:text-scanner-accent transition-colors">Privacy</NuxtLink>
+          </div>
         </div>
       </footer>
     </template>
