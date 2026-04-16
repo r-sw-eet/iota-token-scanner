@@ -96,7 +96,9 @@ export class EcosystemService implements OnModuleInit {
     const packages: PackageInfo[] = [];
     let cursor: string | null = null;
 
-    for (let page = 0; page < 20; page++) {
+    // Drain the full list. Safety cap at 2000 pages (100k packages) — if
+    // mainnet ever has more, bump this; never let it cut the scan silently.
+    for (let page = 0; page < 2000; page++) {
       const afterClause: string = cursor ? `, after: "${cursor}"` : '';
       const data: any = await this.graphql(`{
         packages(first: 50${afterClause}) {
@@ -113,6 +115,10 @@ export class EcosystemService implements OnModuleInit {
       if (!data.packages.pageInfo.hasNextPage) break;
       cursor = data.packages.pageInfo.endCursor;
     }
+    if (packages.length >= 2000 * 50) {
+      this.logger.warn(`Package scan hit the 100k safety cap — results may be incomplete`);
+    }
+    this.logger.log(`Fetched ${packages.length} mainnet packages`);
     return packages;
   }
 
@@ -221,7 +227,7 @@ export class EcosystemService implements OnModuleInit {
     let totalSenders = 0;
 
     for (const p of projects) {
-      for (const mod of p.modules!.slice(0, 5)) {
+      for (const mod of p.modules!) {
         const count = await this.backfillSendersForModule(p.latestPackageAddress!, mod);
         totalModules += 1;
         totalSenders += count;
@@ -404,7 +410,7 @@ export class EcosystemService implements OnModuleInit {
       let events = 0;
       let eventsCapped = false;
       const projectSenders = new Set<string>();
-      for (const mod of mods.slice(0, 5)) {
+      for (const mod of mods) {
         const result = await this.countEvents(`${latestPkg.address}::${mod}`);
         events += result.count;
         if (result.capped) eventsCapped = true;
