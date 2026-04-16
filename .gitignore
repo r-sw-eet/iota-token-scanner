@@ -13,3 +13,6 @@ playwright-report/
 
 # Deployment (kept local)
 deploy/
+
+# Claude Code (kept local)
+CLAUDE.md
