@@ -7,7 +7,7 @@ import { ibtc, layerzero, wormholeFoundation } from './bridges/_index';
 import { switchboard } from './oracles/_index';
 import { tradeport } from './nft/_index';
 import { gambling } from './games/_index';
-import { ifTesting, studioB8b1, studio0a0d, easyPublish, pointsSystem, boltProtocol, stakingGeneric } from './misc/_index';
+import { ifTesting, ifCore, studioB8b1, studio0a0d, easyPublish, pointsSystem, boltProtocol, stakingGeneric } from './misc/_index';
 
 /**
  * Team registry. Every project references exactly one team via `teamId`.
@@ -46,7 +46,7 @@ export const ALL_TEAMS: Team[] = [
   gambling,
 
   // Misc — IF testing, anonymous studios, and single-project teams
-  ifTesting,
+  ifTesting, ifCore,
   studioB8b1, studio0a0d,
   easyPublish, pointsSystem, boltProtocol, stakingGeneric,
 ];

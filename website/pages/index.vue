@@ -13,6 +13,19 @@ const ecosystemLoading = ref(true)
 const l1Visible = ref(10)
 const l2Visible = ref(10)
 const shadeTeamless = ref(true)
+const hideIotaFoundation = ref(false)
+
+function isIotaFoundation(p: any): boolean {
+  const id = p?.team?.id || ''
+  return id === 'if-core' || id.startsWith('if-')
+}
+
+const l1Filtered = computed(() => {
+  if (!ecosystem.value) return []
+  return hideIotaFoundation.value
+    ? ecosystem.value.l1.filter((p: any) => !isIotaFoundation(p))
+    : ecosystem.value.l1
+})
 
 function toSlug(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -363,11 +376,17 @@ const projectStorageChartOptions = {
         <!-- L1 Move Projects -->
         <div class="mb-8">
           <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
-            <h3 class="text-sm font-semibold text-scanner-accent">L1 — Move VM ({{ ecosystem.l1.length }} projects)</h3>
-            <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Dim projects that are not attributed to a known team">
-              <input v-model="shadeTeamless" type="checkbox" class="accent-scanner-accent" />
-              Shade untagged (no team)
-            </label>
+            <h3 class="text-sm font-semibold text-scanner-accent">L1 — Move VM ({{ l1Filtered.length }}{{ hideIotaFoundation && l1Filtered.length !== ecosystem.l1.length ? ` of ${ecosystem.l1.length}` : '' }} projects)</h3>
+            <div class="flex items-center gap-4">
+              <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Dim projects that are not attributed to a known team">
+                <input v-model="shadeTeamless" type="checkbox" class="accent-scanner-accent" />
+                Shade untagged
+              </label>
+              <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Hide all IOTA Foundation projects (chain primitives, TLIP, Notarization, Traceability, Testing, Identity)">
+                <input v-model="hideIotaFoundation" type="checkbox" class="accent-scanner-accent" />
+                Hide IOTA Foundation
+              </label>
+            </div>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full">
@@ -384,7 +403,7 @@ const projectStorageChartOptions = {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="p in ecosystem.l1.slice(0, l1Visible)" :key="p.name" class="border-t border-scanner-border-subtle hover:bg-scanner-card-hover cursor-pointer transition-opacity" :class="shadeTeamless && !p.team ? 'opacity-40' : ''" @click="navigateTo(`/project/${p.slug}`)">
+                <tr v-for="p in l1Filtered.slice(0, l1Visible)" :key="p.name" class="border-t border-scanner-border-subtle hover:bg-scanner-card-hover cursor-pointer transition-opacity" :class="shadeTeamless && !p.team ? 'opacity-40' : ''" @click="navigateTo(`/project/${p.slug}`)">
                   <td class="py-3 pr-4">
                     <div class="flex items-center gap-3">
                       <ProjectLogo :project="p" size="sm" />
@@ -416,9 +435,9 @@ const projectStorageChartOptions = {
               </tbody>
             </table>
           </div>
-          <div v-if="l1Visible < ecosystem.l1.length" class="mt-4 text-center">
+          <div v-if="l1Visible < l1Filtered.length" class="mt-4 text-center">
             <button @click="l1Visible += 10" class="px-4 py-2 text-sm text-scanner-accent border border-scanner-border rounded-sm hover:bg-scanner-card transition-colors">
-              Show more ({{ ecosystem.l1.length - l1Visible }} remaining)
+              Show more ({{ l1Filtered.length - l1Visible }} remaining)
             </button>
           </div>
         </div>
