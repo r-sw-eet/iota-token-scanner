@@ -438,14 +438,14 @@ const projectStorageChartOptions = {
             <table class="w-full">
               <thead>
                 <tr class="text-[#71717a] text-sm border-b border-scanner-border select-none">
-                  <th class="text-left pb-2 pr-4 cursor-pointer hover:text-scanner-accent" @click="toggleL1Sort('name')">Project<span class="ml-1" :class="sortActive(l1Sort, 'name') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'name') }}</span></th>
-                  <th class="text-left pb-2 pr-4 cursor-pointer hover:text-scanner-accent" @click="toggleL1Sort('team')">Team<span class="ml-1" :class="sortActive(l1Sort, 'team') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'team') }}</span></th>
-                  <th class="text-left pb-2 pr-4 cursor-pointer hover:text-scanner-accent" @click="toggleL1Sort('category')">Category<span class="ml-1" :class="sortActive(l1Sort, 'category') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'category') }}</span></th>
-                  <th class="text-right pb-2 pr-4 cursor-pointer hover:text-scanner-accent" @click="toggleL1Sort('events')">Events<span class="ml-1" :class="sortActive(l1Sort, 'events') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'events') }}</span></th>
-                  <th class="text-right pb-2 pr-4 cursor-pointer hover:text-scanner-accent" title="Unique sender addresses across all modules" @click="toggleL1Sort('uniqueSenders')">Wallets<span class="ml-1" :class="sortActive(l1Sort, 'uniqueSenders') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'uniqueSenders') }}</span></th>
-                  <th class="text-right pb-2 pr-4 cursor-pointer hover:text-scanner-accent" @click="toggleL1Sort('storageIota')">Storage (IOTA)<span class="ml-1" :class="sortActive(l1Sort, 'storageIota') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'storageIota') }}</span></th>
-                  <th class="text-right pb-2 pr-4 cursor-pointer hover:text-scanner-accent" @click="toggleL1Sort('tvl')">TVL<span class="ml-1" :class="sortActive(l1Sort, 'tvl') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'tvl') }}</span></th>
-                  <th class="text-right pb-2 pr-4 cursor-pointer hover:text-scanner-accent" @click="toggleL1Sort('packages')">Packages<span class="ml-1" :class="sortActive(l1Sort, 'packages') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'packages') }}</span></th>
+                  <th class="text-left pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-scanner-accent" @click="toggleL1Sort('name')">Project<span class="ml-1" :class="sortActive(l1Sort, 'name') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'name') }}</span></th>
+                  <th class="text-left pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-scanner-accent" @click="toggleL1Sort('team')">Team<span class="ml-1" :class="sortActive(l1Sort, 'team') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'team') }}</span></th>
+                  <th class="text-left pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-scanner-accent" @click="toggleL1Sort('category')">Category<span class="ml-1" :class="sortActive(l1Sort, 'category') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'category') }}</span></th>
+                  <th class="text-right pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-scanner-accent" @click="toggleL1Sort('events')">Events<span class="ml-1" :class="sortActive(l1Sort, 'events') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'events') }}</span></th>
+                  <th class="text-right pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-scanner-accent" title="Unique sender addresses across all modules" @click="toggleL1Sort('uniqueSenders')">Wallets<span class="ml-1" :class="sortActive(l1Sort, 'uniqueSenders') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'uniqueSenders') }}</span></th>
+                  <th class="text-right pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-scanner-accent" @click="toggleL1Sort('storageIota')">Storage (IOTA)<span class="ml-1" :class="sortActive(l1Sort, 'storageIota') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'storageIota') }}</span></th>
+                  <th class="text-right pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-scanner-accent" @click="toggleL1Sort('tvl')">TVL<span class="ml-1" :class="sortActive(l1Sort, 'tvl') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'tvl') }}</span></th>
+                  <th class="text-right pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-scanner-accent" @click="toggleL1Sort('packages')">Packages<span class="ml-1" :class="sortActive(l1Sort, 'packages') ? 'text-scanner-accent' : 'text-[#3f3f46]'">{{ sortGlyph(l1Sort, 'packages') }}</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -495,9 +495,9 @@ const projectStorageChartOptions = {
             <table class="w-full">
               <thead>
                 <tr class="text-[#71717a] text-sm border-b border-scanner-border select-none">
-                  <th class="text-left pb-2 pr-4 cursor-pointer hover:text-status-active" @click="toggleL2Sort('name')">Project<span class="ml-1" :class="sortActive(l2Sort, 'name') ? 'text-status-active' : 'text-[#3f3f46]'">{{ sortGlyph(l2Sort, 'name') }}</span></th>
-                  <th class="text-left pb-2 pr-4 cursor-pointer hover:text-status-active" @click="toggleL2Sort('category')">Category<span class="ml-1" :class="sortActive(l2Sort, 'category') ? 'text-status-active' : 'text-[#3f3f46]'">{{ sortGlyph(l2Sort, 'category') }}</span></th>
-                  <th class="text-right pb-2 pr-4 cursor-pointer hover:text-status-active" @click="toggleL2Sort('tvl')">TVL<span class="ml-1" :class="sortActive(l2Sort, 'tvl') ? 'text-status-active' : 'text-[#3f3f46]'">{{ sortGlyph(l2Sort, 'tvl') }}</span></th>
+                  <th class="text-left pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-status-active" @click="toggleL2Sort('name')">Project<span class="ml-1" :class="sortActive(l2Sort, 'name') ? 'text-status-active' : 'text-[#3f3f46]'">{{ sortGlyph(l2Sort, 'name') }}</span></th>
+                  <th class="text-left pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-status-active" @click="toggleL2Sort('category')">Category<span class="ml-1" :class="sortActive(l2Sort, 'category') ? 'text-status-active' : 'text-[#3f3f46]'">{{ sortGlyph(l2Sort, 'category') }}</span></th>
+                  <th class="text-right pb-2 pr-4 cursor-pointer whitespace-nowrap hover:text-status-active" @click="toggleL2Sort('tvl')">TVL<span class="ml-1" :class="sortActive(l2Sort, 'tvl') ? 'text-status-active' : 'text-[#3f3f46]'">{{ sortGlyph(l2Sort, 'tvl') }}</span></th>
                 </tr>
               </thead>
               <tbody>
