@@ -151,14 +151,14 @@ export class EcosystemService implements OnModuleInit {
     let record = await this.senderModel.findOne({ packageAddress, module });
 
     if (!record) {
-      // First scan: skip historical events by anchoring the cursor at the latest event.
+      // Anchor cursor at current end so future scans only see new events.
       try {
         const latest: any = await this.graphql(`{
           events(filter: { emittingModule: "${emittingModule}" }, last: 1) {
             pageInfo { endCursor }
           }
         }`);
-        record = await this.senderModel.create({
+        await this.senderModel.create({
           packageAddress,
           module,
           cursor: latest.events?.pageInfo?.endCursor ?? null,
@@ -166,17 +166,83 @@ export class EcosystemService implements OnModuleInit {
           eventsScanned: 0,
         });
       } catch {
-        return [];
+        // ignore
       }
       return [];
     }
 
+    await this.pageForwardSenders(record, emittingModule, 100);
+    return record.senders;
+  }
+
+  /**
+   * Drain all historical events for a (package, module) starting from cursor=null.
+   * Designed to be invoked from a one-shot CLI; resumes if interrupted.
+   * Returns the total unique sender count.
+   */
+  async backfillSendersForModule(packageAddress: string, module: string): Promise<number> {
+    const emittingModule = `${packageAddress}::${module}`;
+    let record = await this.senderModel.findOne({ packageAddress, module });
+
+    if (!record) {
+      // Backfill mode: cursor=null = page from the very first event.
+      record = await this.senderModel.create({
+        packageAddress,
+        module,
+        cursor: null,
+        senders: [],
+        eventsScanned: 0,
+      });
+    }
+
+    // Drain in 100-page batches (5000 events each) until no more pages.
+    let prevCursor: string | null | undefined;
+    let safety = 0;
+    while (record.cursor !== prevCursor && safety < 100) {
+      prevCursor = record.cursor;
+      const moreScanned = await this.pageForwardSenders(record, emittingModule, 100);
+      if (moreScanned === 0) break;
+      safety += 1;
+    }
+
+    return record.senders.length;
+  }
+
+  async backfillAllSenders(
+    onProgress?: (info: { project: string; module: string; senders: number }) => void,
+  ): Promise<{ totalProjects: number; totalModules: number; totalSenders: number }> {
+    const snapshot = await this.ecoModel.findOne().sort({ createdAt: -1 }).lean().exec();
+    if (!snapshot) {
+      throw new Error('No ecosystem snapshot exists yet — run a scan first.');
+    }
+
+    const projects = snapshot.l1.filter((p) => p.latestPackageAddress && p.modules?.length);
+    let totalModules = 0;
+    let totalSenders = 0;
+
+    for (const p of projects) {
+      for (const mod of p.modules!.slice(0, 5)) {
+        const count = await this.backfillSendersForModule(p.latestPackageAddress!, mod);
+        totalModules += 1;
+        totalSenders += count;
+        onProgress?.({ project: p.name, module: mod, senders: count });
+      }
+    }
+
+    return { totalProjects: projects.length, totalModules, totalSenders };
+  }
+
+  /**
+   * Pages forward from `record.cursor`, accumulating senders. Mutates and saves
+   * `record`. Returns the number of events scanned in this call.
+   */
+  private async pageForwardSenders(record: ProjectSenders, emittingModule: string, maxPages: number): Promise<number> {
     let cursor = record.cursor;
     const senders = new Set(record.senders);
     const before = senders.size;
     let scanned = 0;
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < maxPages; i++) {
       const after = cursor ? `, after: "${cursor}"` : '';
       try {
         const data: any = await this.graphql(`{
@@ -204,8 +270,7 @@ export class EcosystemService implements OnModuleInit {
       record.eventsScanned += scanned;
       await record.save();
     }
-
-    return record.senders;
+    return scanned;
   }
 
   private matchProject(mods: Set<string>, address: string): ProjectDefinition | null {

@@ -13,7 +13,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:functional": "jest --config test/jest-functional.config.js"
+    "test:functional": "jest --config test/jest-functional.config.js",
+    "backfill:senders": "node dist/backfill-senders"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
