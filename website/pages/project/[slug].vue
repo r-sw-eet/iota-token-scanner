@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const { $api } = useApi()
-const { formatCompact } = useIota()
+const { formatCompact, explorerAddress, explorerObject } = useIota()
 
 const slug = route.params.slug as string
 const project = ref<any>(null)
@@ -144,7 +144,9 @@ function copyToClipboard(text: string) {
         <MetricCard v-if="project.layer === 'L1'" label="Storage" :value="`${project.storageIota.toFixed(4)} IOTA`" subtitle="Package storage deposits" />
         <MetricCard v-if="project.tvl" label="TVL" :value="`$${formatCompact(project.tvl)}`" subtitle="From DefiLlama" />
         <MetricCard v-if="project.layer === 'L1'" label="Package Versions" :value="String(project.packages)" subtitle="Deployed on mainnet" />
-        <MetricCard v-if="project.packageAddress" label="Package" :value="`${project.packageAddress.slice(0, 10)}...`" :subtitle="project.packageAddress" />
+        <a v-if="project.packageAddress" :href="explorerObject(project.packageAddress)" target="_blank" rel="noopener" class="block hover:ring-1 hover:ring-scanner-accent/40 rounded transition-shadow" :title="`Open ${project.packageAddress} in IOTA Explorer`">
+          <MetricCard label="Package ↗" :value="`${project.packageAddress.slice(0, 10)}...`" :subtitle="project.packageAddress" />
+        </a>
       </div>
 
       <!-- Activity Charts -->
@@ -176,8 +178,11 @@ function copyToClipboard(text: string) {
         <div class="bg-scanner-card border border-scanner-border rounded p-4">
           <p class="text-sm text-[#71717a] mb-2">Addresses observed publishing this project's matched packages:</p>
           <div class="space-y-1">
-            <div v-for="addr in project.detectedDeployers" :key="addr" class="font-mono text-xs break-all" :class="project.anomalousDeployers?.includes(addr) ? 'text-amber-400' : 'text-[#a1a1aa]'">
-              {{ addr }}<span v-if="project.anomalousDeployers?.includes(addr)" class="ml-2 text-[10px] uppercase tracking-wider">⚠ anomaly</span>
+            <div v-for="addr in project.detectedDeployers" :key="addr" class="font-mono text-xs break-all">
+              <a :href="explorerAddress(addr)" target="_blank" rel="noopener" class="hover:underline transition-colors" :class="project.anomalousDeployers?.includes(addr) ? 'text-amber-400' : 'text-[#a1a1aa] hover:text-scanner-accent'" :title="`Open ${addr} in IOTA Explorer`">
+                {{ addr }} <span class="text-[#52525b]">↗</span>
+              </a>
+              <span v-if="project.anomalousDeployers?.includes(addr)" class="ml-2 text-[10px] uppercase tracking-wider text-amber-400">⚠ anomaly</span>
             </div>
           </div>
           <p v-if="project.anomalousDeployers?.length && project.team" class="text-xs text-amber-400/80 mt-3">
@@ -211,7 +216,7 @@ function copyToClipboard(text: string) {
                   {{ evt.type }}
                 </span>
                 <span class="text-xs text-[#71717a] shrink-0">{{ relativeTime(evt.timestamp) }}</span>
-                <span class="text-xs text-[#52525b] font-mono truncate">{{ shortAddr(evt.sender) }}</span>
+                <a v-if="evt.sender" :href="explorerAddress(evt.sender)" target="_blank" rel="noopener" class="text-xs text-[#52525b] font-mono truncate hover:text-scanner-accent transition-colors" :title="`Open ${evt.sender} in IOTA Explorer`" @click.stop>{{ shortAddr(evt.sender) }}</a>
               </div>
               <span class="text-[#52525b] text-xs shrink-0 ml-2" :class="expandedEvent === i ? 'rotate-90' : ''" style="transition: transform 0.15s">&#9654;</span>
             </div>
@@ -224,7 +229,11 @@ function copyToClipboard(text: string) {
                 </div>
                 <div>
                   <span class="text-[#52525b]">Sender</span>
-                  <p class="text-[#a1a1aa] font-mono break-all">{{ evt.sender }}</p>
+                  <p class="font-mono break-all">
+                    <a :href="explorerAddress(evt.sender)" target="_blank" rel="noopener" class="text-[#a1a1aa] hover:text-scanner-accent transition-colors" :title="`Open ${evt.sender} in IOTA Explorer`">
+                      {{ evt.sender }} <span class="text-[#52525b]">↗</span>
+                    </a>
+                  </p>
                 </div>
                 <div class="col-span-2">
                   <span class="text-[#52525b]">Event Type</span>

@@ -20,5 +20,25 @@ export function useIota() {
     return `${value.toFixed(decimals)}%`
   }
 
-  return { formatIota, formatCompact, formatPercent }
+  const EXPLORER = 'https://explorer.iota.org'
+
+  function explorerAddress(addr: string): string {
+    return `${EXPLORER}/address/${addr}?network=mainnet`
+  }
+
+  function explorerObject(addr: string): string {
+    return `${EXPLORER}/object/${addr}?network=mainnet`
+  }
+
+  function explorerTx(digest: string): string {
+    return `${EXPLORER}/txblock/${digest}?network=mainnet`
+  }
+
+  function shortAddr(addr: string | null | undefined, head = 8, tail = 6): string {
+    if (!addr) return ''
+    if (addr.length <= head + tail + 3) return addr
+    return `${addr.slice(0, head)}…${addr.slice(-tail)}`
+  }
+
+  return { formatIota, formatCompact, formatPercent, explorerAddress, explorerObject, explorerTx, shortAddr }
 }

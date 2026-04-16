@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { $api } = useApi()
+const { explorerAddress } = useIota()
 const route = useRoute()
 const id = computed(() => String(route.params.id))
 
@@ -44,7 +45,11 @@ watch(id, load)
         <h2 class="text-lg font-bold text-[#f4f4f5] mb-3">Known Deployer Addresses</h2>
         <p class="text-sm text-[#71717a] mb-3">Mainnet addresses that have published packages for this team.</p>
         <div class="bg-scanner-card border border-scanner-border rounded p-4 space-y-1">
-          <div v-for="addr in team.deployers" :key="addr" class="font-mono text-xs text-[#a1a1aa] break-all">{{ addr }}</div>
+          <div v-for="addr in team.deployers" :key="addr" class="font-mono text-xs break-all">
+            <a :href="explorerAddress(addr)" target="_blank" rel="noopener" class="text-[#a1a1aa] hover:text-scanner-accent transition-colors" :title="`Open ${addr} in IOTA Explorer`">
+              {{ addr }} <span class="text-[#52525b]">↗</span>
+            </a>
+          </div>
           <div v-if="!team.deployers?.length" class="text-sm text-[#52525b] italic">No deployers registered for this team.</div>
         </div>
       </section>
