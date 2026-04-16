@@ -74,6 +74,12 @@ jobs:
   deploy:
     needs: [api-test, web-test, web-e2e]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Serialize deploys — parallel main pushes (or fast-follow commits) can't
+    # race on the SSH deploy step. Pair with the flock inside scripts/deploy.sh
+    # so direct invocations on the server are also safe.
+    concurrency:
+      group: deploy-main
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
