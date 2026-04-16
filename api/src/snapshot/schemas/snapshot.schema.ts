@@ -52,9 +52,6 @@ export class Snapshot extends Document {
   storagePrice: number;
 
   @Prop()
-  tlipEventCount: number;
-
-  @Prop()
   checkpointCount: number;
 
   // Gas burn / deflation data (from previous epoch)

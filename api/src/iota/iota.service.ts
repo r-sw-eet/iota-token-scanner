@@ -4,8 +4,6 @@ const RPC_URL = 'https://api.mainnet.iota.cafe';
 const GRAPHQL_URL = 'https://graphql.mainnet.iota.cafe';
 const NANOS_PER_IOTA = 1_000_000_000n;
 
-const TLIP_PACKAGE = '0xdeadee97bb146c273e9cc55ec26c1d2936133119acc1b2fc0b542e279007e108';
-
 @Injectable()
 export class IotaService {
   private readonly logger = new Logger(IotaService.name);
@@ -154,27 +152,6 @@ export class IotaService {
     return Number(data.checkpoint.networkTotalTransactions);
   }
 
-  async getTlipEventCount(): Promise<number> {
-    // Count events emitted by the TLIP package modules
-    const modules = ['ebl', 'carrier_registry', 'endorsement', 'interop_control', 'notarization'];
-    let total = 0;
-
-    for (const mod of modules) {
-      try {
-        const data = await this.graphql(`{
-          events(filter: { emittingModule: "${TLIP_PACKAGE}::${mod}" }, last: 50) {
-            nodes { __typename }
-          }
-        }`);
-        total += data.events?.nodes?.length ?? 0;
-      } catch {
-        // Module may not have events, skip
-      }
-    }
-
-    return total;
-  }
-
   async captureFullSnapshot() {
     this.logger.log('Fetching IOTA mainnet data...');
 
@@ -186,14 +163,6 @@ export class IotaService {
         this.getValidatorsApy(),
         this.getNetworkTotalTransactions(),
       ]);
-
-    // TLIP events fetched separately (multiple GraphQL calls, less critical)
-    let tlipEventCount = 0;
-    try {
-      tlipEventCount = await this.getTlipEventCount();
-    } catch (e) {
-      this.logger.warn('Failed to fetch TLIP events', e);
-    }
 
     // Previous epoch gas/tx data
     let epochStats = { epochGasBurned: 0, epochTransactions: 0, epochStorageNetInflow: 0, gasPerTransaction: 0 };
@@ -224,7 +193,6 @@ export class IotaService {
       networkTotalTransactions: networkTx,
       referenceGasPrice: systemState.referenceGasPrice,
       storagePrice: protocol.storageGasPrice,
-      tlipEventCount,
       checkpointCount: circulating.atCheckpoint,
       ...epochStats,
     };

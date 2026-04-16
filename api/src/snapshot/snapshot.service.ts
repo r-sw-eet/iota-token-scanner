@@ -118,7 +118,6 @@ export class SnapshotService implements OnModuleInit {
                 networkTotalTransactions: 0,
                 referenceGasPrice: 0,
                 storagePrice: 0,
-                tlipEventCount: 0,
                 checkpointCount: 0,
               },
             },
