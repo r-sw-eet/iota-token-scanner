@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { EcosystemService } from './ecosystem.service';
 import { EcosystemSnapshot } from './schemas/ecosystem-snapshot.schema';
+import { ProjectSenders } from './schemas/project-senders.schema';
 import { ProjectDefinition } from './projects';
 
 jest.mock('./projects', () => {
@@ -51,6 +52,33 @@ jest.mock('./projects', () => {
       teamId: null,
       match: { minModules: 3 },
     },
+    {
+      name: 'EmptyMatch',
+      layer: 'L1',
+      category: 'Test',
+      description: 'Def with no synchronous matcher — only reachable via fingerprint or team routing.',
+      urls: [],
+      teamId: null,
+      match: {},
+    },
+    {
+      name: 'FingerprintOnly',
+      layer: 'L1',
+      category: 'Test',
+      description: 'Def with only a fingerprint — must be invisible to the sync matcher.',
+      urls: [],
+      teamId: null,
+      match: { fingerprint: { type: 'foo::Bar' } },
+    },
+    {
+      name: 'Combo',
+      layer: 'L1',
+      category: 'Test',
+      description: 'Def with both packageAddresses and a fingerprint (Salus-style).',
+      urls: [],
+      teamId: null,
+      match: { packageAddresses: ['0x999'], fingerprint: { type: 'foo::Bar' } },
+    },
   ];
   return { ALL_PROJECTS: projects, ProjectDefinition: undefined };
 });
@@ -63,6 +91,7 @@ describe('EcosystemService.matchProject', () => {
       providers: [
         EcosystemService,
         { provide: getModelToken(EcosystemSnapshot.name), useValue: {} },
+        { provide: getModelToken(ProjectSenders.name), useValue: {} },
       ],
     }).compile();
     service = module.get(EcosystemService);
@@ -111,5 +140,29 @@ describe('EcosystemService.matchProject', () => {
 
   it('returns null when no matcher matches', () => {
     expect(match(['unknown'])).toBeNull();
+  });
+
+  it('skips defs with no synchronous matcher (empty match)', () => {
+    // EmptyMatch is in ALL_PROJECTS but must never be returned here — it's only
+    // claimable via matchByFingerprint or deployer→team routing in fetchFull.
+    // If the skip logic regressed, EmptyMatch would match every input via the
+    // fall-through `return def;` in the loop.
+    expect(match([])).toBeNull();
+    expect(match(['anything-at-all'])).toBeNull();
+    expect(match(['z1', 'z2'])).toBeNull();
+  });
+
+  it('skips fingerprint-only defs in the synchronous matcher', () => {
+    // FingerprintOnly has a `fingerprint` but no packageAddresses/exact/all/any/minModules.
+    // matchProject must ignore it — fingerprint matching happens separately (async).
+    expect(match(['foo'])).toBeNull();
+  });
+
+  it('matches Combo via packageAddresses despite having a fingerprint', () => {
+    // Confirms `packageAddresses` still wins when present alongside `fingerprint`
+    // (the Salus-style pattern: a known address pinned, plus a fingerprint to
+    // discover new packages by the same issuer).
+    expect(match([], '0x999').name).toBe('Combo');
+    expect(match([], '0x0999')).toBeNull();
   });
 });

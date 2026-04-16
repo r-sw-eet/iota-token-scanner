@@ -12,6 +12,7 @@ const error = ref(false)
 const ecosystemLoading = ref(true)
 const l1Visible = ref(10)
 const l2Visible = ref(10)
+const shadeTeamless = ref(true)
 
 function toSlug(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -361,7 +362,13 @@ const projectStorageChartOptions = {
 
         <!-- L1 Move Projects -->
         <div class="mb-8">
-          <h3 class="text-sm font-semibold text-scanner-accent mb-3">L1 — Move VM ({{ ecosystem.l1.length }} projects)</h3>
+          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <h3 class="text-sm font-semibold text-scanner-accent">L1 — Move VM ({{ ecosystem.l1.length }} projects)</h3>
+            <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Dim projects that are not attributed to a known team">
+              <input v-model="shadeTeamless" type="checkbox" class="accent-scanner-accent" />
+              Shade untagged (no team)
+            </label>
+          </div>
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead>
@@ -375,7 +382,7 @@ const projectStorageChartOptions = {
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="p in ecosystem.l1.slice(0, l1Visible)" :key="p.name" class="border-t border-scanner-border-subtle hover:bg-scanner-card-hover cursor-pointer" @click="navigateTo(`/project/${p.slug}`)">
+                <tr v-for="p in ecosystem.l1.slice(0, l1Visible)" :key="p.name" class="border-t border-scanner-border-subtle hover:bg-scanner-card-hover cursor-pointer transition-opacity" :class="shadeTeamless && !p.team ? 'opacity-40' : ''" @click="navigateTo(`/project/${p.slug}`)">
                   <td class="py-3 pr-4">
                     <div class="flex items-center gap-3">
                       <ProjectLogo :name="p.name" size="sm" />

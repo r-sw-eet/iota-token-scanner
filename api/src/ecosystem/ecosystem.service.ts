@@ -2,9 +2,11 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron } from '@nestjs/schedule';
 import { Model } from 'mongoose';
+import { createHash } from 'crypto';
 import { EcosystemSnapshot } from './schemas/ecosystem-snapshot.schema';
+import { ProjectSenders } from './schemas/project-senders.schema';
 import { ALL_PROJECTS, ProjectDefinition } from './projects';
-import { Team, getTeam } from './teams';
+import { Team, getTeam, getTeamByDeployer } from './teams';
 
 const GRAPHQL_URL = 'https://graphql.mainnet.iota.cafe';
 
@@ -33,6 +35,8 @@ export interface Project {
   detectedDeployers: string[];
   /** Subset of `detectedDeployers` not present in the team's known deployer list — worth inspecting. */
   anomalousDeployers: string[];
+  /** Unique sender addresses seen across this project's modules since first scan. */
+  uniqueSenders: number;
 }
 
 interface PackageInfo {
@@ -48,6 +52,7 @@ export class EcosystemService implements OnModuleInit {
 
   constructor(
     @InjectModel(EcosystemSnapshot.name) private ecoModel: Model<EcosystemSnapshot>,
+    @InjectModel(ProjectSenders.name) private senderModel: Model<ProjectSenders>,
   ) {}
 
   async onModuleInit() {
@@ -134,6 +139,75 @@ export class EcosystemService implements OnModuleInit {
     return { count: total, capped: total >= maxPages * 50 };
   }
 
+  /**
+   * Incrementally collect unique sender addresses for a (package, module).
+   *
+   * On first encounter we set the cursor to the current end of events (no
+   * historical backfill — that's a separate one-time job). Subsequent scans
+   * fetch only events after the stored cursor.
+   */
+  private async updateSendersForModule(packageAddress: string, module: string): Promise<string[]> {
+    const emittingModule = `${packageAddress}::${module}`;
+    let record = await this.senderModel.findOne({ packageAddress, module });
+
+    if (!record) {
+      // First scan: skip historical events by anchoring the cursor at the latest event.
+      try {
+        const latest: any = await this.graphql(`{
+          events(filter: { emittingModule: "${emittingModule}" }, last: 1) {
+            pageInfo { endCursor }
+          }
+        }`);
+        record = await this.senderModel.create({
+          packageAddress,
+          module,
+          cursor: latest.events?.pageInfo?.endCursor ?? null,
+          senders: [],
+          eventsScanned: 0,
+        });
+      } catch {
+        return [];
+      }
+      return [];
+    }
+
+    let cursor = record.cursor;
+    const senders = new Set(record.senders);
+    const before = senders.size;
+    let scanned = 0;
+
+    for (let i = 0; i < 100; i++) {
+      const after = cursor ? `, after: "${cursor}"` : '';
+      try {
+        const data: any = await this.graphql(`{
+          events(filter: { emittingModule: "${emittingModule}" }, first: 50${after}) {
+            nodes { sender { address } }
+            pageInfo { hasNextPage endCursor }
+          }
+        }`);
+        const nodes = data.events?.nodes ?? [];
+        for (const e of nodes) {
+          const addr = e.sender?.address?.toLowerCase();
+          if (addr) senders.add(addr);
+        }
+        scanned += nodes.length;
+        cursor = data.events?.pageInfo?.endCursor ?? cursor;
+        if (!data.events?.pageInfo?.hasNextPage) break;
+      } catch {
+        break;
+      }
+    }
+
+    if (scanned > 0 || senders.size !== before) {
+      record.senders = Array.from(senders);
+      record.cursor = cursor;
+      record.eventsScanned += scanned;
+      await record.save();
+    }
+
+    return record.senders;
+  }
+
   private matchProject(mods: Set<string>, address: string): ProjectDefinition | null {
     const lowerAddr = address.toLowerCase();
     for (const def of ALL_PROJECTS) {
@@ -147,6 +221,9 @@ export class EcosystemService implements OnModuleInit {
         if (mods.size === expected.size && [...expected].every((m) => mods.has(m))) return def;
         continue;
       }
+      // Defs with no synchronous matcher are only claimable via fingerprint or
+      // team-deployer routing; skip them here.
+      if (!match.all && !match.any && !match.minModules) continue;
       if (match.all && !match.all.every((m) => mods.has(m))) continue;
       if (match.any && !match.any.some((m) => mods.has(m))) continue;
       if (match.minModules && mods.size < match.minModules) continue;
@@ -175,6 +252,35 @@ export class EcosystemService implements OnModuleInit {
     }
   }
 
+  /**
+   * Sample one Move object from the package and extract a human-readable label.
+   * Tries `<pkg>::<module>::NFT` then `<pkg>::<module>::Nft` for each module.
+   * Returns the first non-empty `tag`/`name`/`collection_name` field found.
+   */
+  private async probeSampleName(pkgAddress: string, modules: string[]): Promise<string | null> {
+    for (const mod of modules.slice(0, 3)) {
+      for (const structName of ['NFT', 'Nft']) {
+        try {
+          const data: any = await this.graphql(`{
+            objects(filter: { type: "${pkgAddress}::${mod}::${structName}" }, first: 1) {
+              nodes { asMoveObject { contents { json } } }
+            }
+          }`);
+          const fields = data.objects?.nodes?.[0]?.asMoveObject?.contents?.json;
+          if (!fields) continue;
+          const candidate = fields.tag ?? fields.name ?? fields.collection_name;
+          if (typeof candidate !== 'string') continue;
+          const trimmed = candidate.trim();
+          if (!trimmed || trimmed.length > 80) continue;
+          return trimmed;
+        } catch {
+          // try next struct/module
+        }
+      }
+    }
+    return null;
+  }
+
   private async matchByFingerprint(mods: Set<string>, address: string): Promise<ProjectDefinition | null> {
     for (const def of ALL_PROJECTS) {
       const fp = def.match.fingerprint;
@@ -189,29 +295,56 @@ export class EcosystemService implements OnModuleInit {
   private async fetchFull() {
     const allPackages = await this.getAllPackages();
 
-    const projectMap = new Map<string, { def: ProjectDefinition; packages: PackageInfo[] }>();
+    const projectMap = new Map<string, { def: ProjectDefinition; packages: PackageInfo[]; splitDeployer?: string }>();
     for (const pkg of allPackages) {
       if (pkg.address.startsWith('0x000000000000000000000000000000000000000000000000000000000000000')) continue;
       const mods = new Set((pkg.modules?.nodes || []).map((m) => m.name));
       let def = this.matchProject(mods, pkg.address);
+      // When the synchronous match is an aggregate bucket, consult fingerprint
+      // first — a more-specific project may claim this package by `issuer`/`tag`.
+      if (def?.splitByDeployer) {
+        const fp = await this.matchByFingerprint(mods, pkg.address);
+        if (fp && fp.name !== def.name) def = fp;
+      }
       if (!def) def = await this.matchByFingerprint(mods, pkg.address);
       if (!def) continue;
-      const existing = projectMap.get(def.name);
-      if (existing) { existing.packages.push(pkg); } else { projectMap.set(def.name, { def, packages: [pkg] }); }
+
+      let mapKey = def.name;
+      let splitDeployer: string | undefined;
+      if (def.splitByDeployer) {
+        const deployer = pkg.previousTransactionBlock?.sender?.address?.toLowerCase() ?? 'unknown';
+        // Team routing: if this deployer is claimed by a team with exactly
+        // one project, attribute the package to that project instead of
+        // leaving it in the aggregate bucket.
+        const team = getTeamByDeployer(deployer);
+        const teamProjects = team ? ALL_PROJECTS.filter((p) => p.teamId === team.id) : [];
+        if (teamProjects.length === 1) {
+          def = teamProjects[0];
+          mapKey = def.name;
+        } else {
+          splitDeployer = deployer;
+          mapKey = `${def.name}::${deployer}`;
+        }
+      }
+      const existing = projectMap.get(mapKey);
+      if (existing) { existing.packages.push(pkg); } else { projectMap.set(mapKey, { def, packages: [pkg], splitDeployer }); }
     }
 
     const projects: Project[] = [];
-    for (const [, { def, packages }] of projectMap) {
+    for (const [, { def, packages, splitDeployer }] of projectMap) {
       const latestPkg = packages[packages.length - 1];
       const mods = (latestPkg.modules?.nodes || []).map((m) => m.name);
       const totalStorage = packages.reduce((sum, p) => sum + Number(p.storageRebate || 0), 0) / 1_000_000_000;
 
       let events = 0;
       let eventsCapped = false;
+      const projectSenders = new Set<string>();
       for (const mod of mods.slice(0, 5)) {
         const result = await this.countEvents(`${latestPkg.address}::${mod}`);
         events += result.count;
         if (result.capped) eventsCapped = true;
+        const senders = await this.updateSendersForModule(latestPkg.address, mod);
+        senders.forEach((s) => projectSenders.add(s));
       }
 
       const team = getTeam(def.teamId) ?? null;
@@ -230,11 +363,20 @@ export class EcosystemService implements OnModuleInit {
         );
       }
 
+      let displayName = def.name;
+      if (splitDeployer) {
+        const hash = createHash('sha256').update(splitDeployer).digest('hex').slice(0, 6);
+        const sampled = await this.probeSampleName(latestPkg.address, mods);
+        displayName = sampled
+          ? `${def.name}: ${sampled} (${hash})`
+          : `${def.name} (deployer-${hash})`;
+      }
+
       const firstPkg = packages[0]; // original deployment — address never changes
       const addrPrefix = firstPkg.address.slice(2, 8);
       projects.push({
-        slug: `${addrPrefix}-${def.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`,
-        name: def.name, layer: def.layer, category: def.category,
+        slug: `${addrPrefix}-${displayName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`,
+        name: displayName, layer: def.layer, category: def.category,
         description: def.description, urls: def.urls,
         packages: packages.length,
         packageAddress: firstPkg.address,
@@ -246,6 +388,7 @@ export class EcosystemService implements OnModuleInit {
         disclaimer: def.disclaimer ?? null,
         detectedDeployers,
         anomalousDeployers,
+        uniqueSenders: projectSenders.size,
       });
     }
 
@@ -299,6 +442,7 @@ export class EcosystemService implements OnModuleInit {
           disclaimer: null,
           detectedDeployers: [],
           anomalousDeployers: [],
+          uniqueSenders: 0,
         });
       }
     } catch (e) {

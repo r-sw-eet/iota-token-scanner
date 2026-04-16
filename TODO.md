@@ -23,6 +23,13 @@ Show grouped transactions that compose a single use case:
 - [ ] Detect operation groups on-chain by analyzing linked transactions (shared objects, sequential digests from same sender within a time window)
 - [ ] Display as "1 swap = N tx" breakdown per project
 
+## Ecosystem project-def audit
+
+Revisit after several ecosystem snapshots (to confirm the packages don't reappear post-matcher fixes):
+
+- [ ] **`swirlValidator`** (api/src/ecosystem/projects/defi/swirl.ts:16) — matches 0 packages on mainnet today (`all: ['cert', 'native_pool', 'validator']`). Either module names drifted, the contracts were never deployed, or the deployer renamed them. Action: verify against Swirl's latest source / confirm deployer `0x043b7d4d…` activity, then either fix the matcher or delete the def.
+- [ ] **`virtueStability`** (api/src/ecosystem/projects/defi/virtue.ts:16) — matches 0 packages on mainnet today (`all: ['stability_pool', 'borrow_incentive']`). Same triage: verify modules, check if subsumed by `virtue` / `virtuePool`, fix or drop.
+
 ## Storage deposit lifetime analysis
 
 - [ ] Track object creation and deletion events to measure how long storage deposits are actually held

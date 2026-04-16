@@ -6,3 +6,4 @@ export { giftDrop } from './gift-drop';
 export { pointsSystem } from './points-system';
 export { boltProtocol } from './bolt-protocol';
 export { staking } from './staking';
+export { ifTesting } from './if-testing';

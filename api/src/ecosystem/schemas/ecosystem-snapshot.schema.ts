@@ -21,6 +21,7 @@ export class ProjectDoc {
   @Prop() disclaimer: string;
   @Prop({ type: [String] }) detectedDeployers: string[];
   @Prop({ type: [String] }) anomalousDeployers: string[];
+  @Prop({ default: 0 }) uniqueSenders: number;
 }
 
 @Schema({ timestamps: true })

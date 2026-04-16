@@ -7,7 +7,7 @@ import { ibtcBridge, layerZero, layerZeroOft, wormhole } from './bridges/_index'
 import { pythOracle, switchboardOracle } from './oracles/_index';
 import { nftLaunchpad, tradeport, nftCollections } from './nft/_index';
 import { chess, ticTacToe, game2048, gambling } from './games/_index';
-import { marketplaceEscrow, vault, tokenSale, easyPublish, giftDrop, pointsSystem, boltProtocol, staking } from './misc/_index';
+import { marketplaceEscrow, vault, tokenSale, easyPublish, giftDrop, pointsSystem, boltProtocol, staking, ifTesting } from './misc/_index';
 
 /**
  * All known project definitions, ordered by match priority.
@@ -40,6 +40,7 @@ export const ALL_PROJECTS: ProjectDefinition[] = [
   // Misc
   marketplaceEscrow, vault, tokenSale, easyPublish,
   giftDrop, pointsSystem, boltProtocol, staking,
+  ifTesting,
 ];
 
 export { ProjectDefinition };

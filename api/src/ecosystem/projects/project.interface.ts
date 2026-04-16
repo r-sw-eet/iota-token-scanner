@@ -12,6 +12,8 @@ export interface ProjectDefinition {
   teamId: string | null;
   /** Optional caveat shown to users. Use for aggregate buckets that almost certainly mix distinct projects we can't yet distinguish. */
   disclaimer?: string;
+  /** Split matched packages into one sub-project per distinct deployer. Use for aggregate buckets where deployer discriminates distinct projects. */
+  splitByDeployer?: boolean;
   /** How to identify this project's packages. `packageAddresses` wins over module matchers; `fingerprint` enables auto-discovery of unknown packages by sampling a Move object's fields. */
   match: {
     all?: string[];
