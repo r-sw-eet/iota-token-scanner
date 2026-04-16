@@ -31,7 +31,8 @@ jobs:
         with:
           files: ./api/coverage/lcov.info
           flags: api
-          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
 
   web-test:
     runs-on: ubuntu-latest
@@ -51,7 +52,8 @@ jobs:
         with:
           files: ./website/coverage/lcov.info
           flags: web
-          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
 
   web-e2e:
     runs-on: ubuntu-latest
