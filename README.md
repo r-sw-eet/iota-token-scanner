@@ -1,6 +1,6 @@
 # IOTA Trade Scanner
 
-On-chain data analytics dashboard for the IOTA mainnet. Tracks real network activity, monitors 40+ ecosystem projects, and provides transparent claim verification — separating hype from reality.
+On-chain data analytics dashboard for the IOTA mainnet. Tracks real network activity and monitors 40+ ecosystem projects.
 
 > ⚠️ **Work in progress** — this project is under active development. Data may contain errors, some claims are not yet independently verified, and breaking changes can happen at any time. Treat numbers as indicative, not definitive.
 
@@ -60,7 +60,6 @@ All endpoints prefixed with `/api/v1`.
 | `GET /ecosystem`                               | Ecosystem overview (all L1/L2 projects, events, storage, TVL) |
 | `GET /ecosystem/project/:slug`                 | Single project details                                        |
 | `GET /ecosystem/project/:slug/events?limit=20` | Recent on-chain events for a project                          |
-| `GET /claims`                                  | Claim verifications (claimed vs reality)                      |
 
 ## Data Sources
 
@@ -89,14 +88,13 @@ iota-trade-scanner/
 │   │   ├── snapshot/       # Network snapshots (epoch data)
 │   │   ├── ecosystem/      # Project discovery & monitoring
 │   │   │   └── projects/   # 40+ project definitions (DeFi, Trade, NFT, ...)
-│   │   ├── claims/         # Claim verification ("Reality Check")
 │   │   └── iota/           # IOTA RPC/GraphQL client
 │   └── Dockerfile
 ├── website/                # Nuxt 3 frontend (SPA)
 │   ├── pages/
 │   │   ├── index.vue       # Main dashboard
 │   │   └── project/[slug].vue  # Project detail page
-│   ├── components/         # MetricCard, EpochCharts, ClaimCard, ProjectLogo
+│   ├── components/         # MetricCard, EpochCharts, ProjectLogo
 │   ├── composables/        # useApi, useIota
 │   └── Dockerfile
 ├── docker-compose.yml

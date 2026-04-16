@@ -6,7 +6,6 @@ import { HealthController } from './health/health.controller';
 import { IotaModule } from './iota/iota.module';
 import { SnapshotModule } from './snapshot/snapshot.module';
 import { EcosystemModule } from './ecosystem/ecosystem.module';
-import { ClaimsModule } from './claims/claims.module';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { ClaimsModule } from './claims/claims.module';
     IotaModule,
     SnapshotModule,
     EcosystemModule,
-    ClaimsModule,
   ],
   controllers: [HealthController],
 })
