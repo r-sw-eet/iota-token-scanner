@@ -6,12 +6,6 @@
 - [ ] Set up backups (restic → Hetzner Object Storage; enable `iota_trade_scanner_backup_enabled` once S3 creds provisioned)
 - [ ] Add tests (API unit/integration, website component tests)
 
-## Scanner coverage gaps
-
-- [ ] **Native staking on `0x3::iota_system`** — thousands of delegator wallets are currently invisible. Add a dedicated tracker (separate from the ecosystem table) counting unique senders of `StakingRequestEvent` and similar. Likely dwarfs everything we show today.
-- [ ] **`0x2::iota_framework` events** — kiosk trades, display updates, coin-level events. Currently ignored because no `ProjectDefinition` targets the framework. Medium priority.
-- [ ] **Events-per-module ceiling** — `countEvents` caps at 50,000 events per module (`maxPages = 1000` × 50). Top today is Virtue Pool at ~43k and climbing. When it hits 50k the count will silently stop advancing with `eventsCapped: true` set but no loud alarm. Raise the cap or page without a hard ceiling; at minimum surface the flag visibly in the UI.
-
 ## Indexing depth
 
 Currently we index at epoch-level (332 records, ~65 KB). Deeper indexing levels for future consideration:
