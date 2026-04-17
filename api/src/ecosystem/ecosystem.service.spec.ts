@@ -1053,11 +1053,12 @@ describe('EcosystemService', () => {
       expect(teamed.anomalousDeployers).toEqual([]);
     });
 
-    it('enriches L1 projects with DefiLlama TVL when name matches', async () => {
+    it('enriches L1 projects with DefiLlama TVL when name matches — IOTA slice only', async () => {
       (global as any).fetch = scriptFetch({
         packages: [pkg({ address: '0xaa', modules: ['foo', 'bar'] })], // → Exact
         llama: [
-          { name: 'Exact Protocol', tvl: 12345, chains: ['IOTA'] },
+          // tvl = cross-chain total, chainTvls.IOTA = slice; we must use the slice
+          { name: 'Exact Protocol', tvl: 99_999, chainTvls: { IOTA: 12345, Ethereum: 87_654 }, chains: ['IOTA', 'Ethereum'] },
         ],
       });
       const snap = await runCapture();
@@ -1066,14 +1067,44 @@ describe('EcosystemService', () => {
       expect(exact.tvl).toBe(12345);
     });
 
-    it('adds L2 EVM protocols not already present in L1', async () => {
+    it('leaves L1 tvl null when DefiLlama has no IOTA-chain slice for the match', async () => {
+      (global as any).fetch = scriptFetch({
+        packages: [pkg({ address: '0xaa', modules: ['foo', 'bar'] })],
+        llama: [
+          // Multi-chain protocol that matches by name but has no IOTA slice at all
+          { name: 'Exact Protocol', tvl: 50_000, chainTvls: { Ethereum: 50_000 }, chains: ['Ethereum'] },
+        ],
+      });
+      const snap = await runCapture();
+      const exact = snap.l1.find((p: any) => p.name === 'Exact');
+      expect(exact.tvl).toBeNull();
+    });
+
+    it('leaves L1 tvl null and skips L2 add when DefiLlama response omits chainTvls entirely', async () => {
+      (global as any).fetch = scriptFetch({
+        packages: [pkg({ address: '0xaa', modules: ['foo', 'bar'] })],
+        llama: [
+          // L1 name-match protocol on IOTA (passes the chain filter) but with no chainTvls object at all
+          { name: 'Exact Protocol', tvl: 50_000, chains: ['IOTA'] },
+          // L2 candidate with no chainTvls object at all — must be dropped by the floor
+          { name: 'NoSliceDex', tvl: 1_000_000, chains: ['IOTA EVM'], category: 'Dexs', slug: 'noslicedex' },
+        ],
+      });
+      const snap = await runCapture();
+      const exact = snap.l1.find((p: any) => p.name === 'Exact');
+      expect(exact.tvl).toBeNull();
+      expect(snap.l2.map((p: any) => p.name)).not.toContain('NoSliceDex');
+    });
+
+    it('adds L2 EVM protocols not already present in L1 — uses IOTA EVM slice only', async () => {
       (global as any).fetch = scriptFetch({
         packages: [pkg({ address: '0xaa', modules: ['foo', 'bar'] })],
         llama: [
           {
             name: 'L2Dex',
-            tvl: 5_000,
-            chains: ['IOTA EVM'],
+            tvl: 50_000, // cross-chain total — should be ignored
+            chainTvls: { 'IOTA EVM': 5_000, Ethereum: 45_000 },
+            chains: ['IOTA EVM', 'Ethereum'],
             category: 'Dexs',
             url: 'https://l2dex.example',
             slug: 'l2dex',
@@ -1086,13 +1117,14 @@ describe('EcosystemService', () => {
       expect(l2.slug).toBe('evm-l2dex');
       expect(l2.category).toBe('Dexs');
       expect(l2.urls[0]).toEqual({ label: 'Website', href: 'https://l2dex.example' });
+      expect(l2.tvl).toBe(5_000);
     });
 
-    it('skips L2 protocols with TVL below the $100 floor', async () => {
+    it('skips L2 protocols whose IOTA EVM slice is below the $100 floor (even if cross-chain total is huge)', async () => {
       (global as any).fetch = scriptFetch({
         packages: [pkg({ address: '0xaa', modules: ['foo', 'bar'] })],
         llama: [
-          { name: 'DustyDex', tvl: 50, chains: ['IOTA EVM'] },
+          { name: 'DustyDex', tvl: 1_000_000, chainTvls: { 'IOTA EVM': 50, Ethereum: 999_950 }, chains: ['IOTA EVM', 'Ethereum'] },
         ],
       });
       const snap = await runCapture();
@@ -1103,7 +1135,7 @@ describe('EcosystemService', () => {
       (global as any).fetch = scriptFetch({
         packages: [pkg({ address: '0xaa', modules: ['foo', 'bar'] })],
         llama: [
-          { name: 'Exact', tvl: 1000, chains: ['IOTA'] },
+          { name: 'Exact', tvl: 1000, chainTvls: { IOTA: 1000 }, chains: ['IOTA'] },
         ],
       });
       const snap = await runCapture();
@@ -1121,6 +1153,26 @@ describe('EcosystemService', () => {
       const snap = await runCapture();
       expect(snap.l1.map((p: any) => p.name)).toContain('Exact');
       expect(snap.l2).toEqual([]);
+    });
+
+    it('tolerates DefiLlama entries with missing `chains`/`category`/`url` fields', async () => {
+      // Exercises the `(p.chains || [])` fallbacks and the later category/url defaults.
+      (global as any).fetch = scriptFetch({
+        packages: [pkg({ address: '0xaa', modules: ['foo', 'bar'] })],
+        llama: [
+          // No `chains` — must not throw, and must not be treated as an IOTA protocol
+          { name: 'Ghost', tvl: 1000 },
+          // Minimal IOTA EVM entry: no category, no url, no slug → defaults must kick in
+          { name: 'MinL2', chainTvls: { 'IOTA EVM': 500 }, chains: ['IOTA EVM'] },
+        ],
+      });
+      const snap = await runCapture();
+      expect(snap.l2.map((p: any) => p.name)).not.toContain('Ghost');
+      const min = snap.l2.find((p: any) => p.name === 'MinL2');
+      expect(min).toBeTruthy();
+      expect(min.category).toBe('Unknown');
+      expect(min.urls).toEqual([]);
+      expect(min.slug).toBe('evm-minl2');
     });
 
     it('computes total events, storage, and tx rates from the final list', async () => {

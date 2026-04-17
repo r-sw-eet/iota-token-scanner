@@ -487,13 +487,13 @@ export class EcosystemService implements OnModuleInit {
         (p.chains || []).some((c: string) => c === 'IOTA' || c === 'IOTA EVM'),
       );
 
-      // Match TVL to existing L1 projects
+      // Match TVL to existing L1 projects — IOTA-chain slice only, not cross-chain total
       for (const project of projects) {
         const match = iotaProtocols.find((p) =>
           p.name.toLowerCase().includes(project.name.toLowerCase()) ||
           project.name.toLowerCase().includes(p.name.toLowerCase()),
         );
-        if (match) project.tvl = match.tvl ?? null;
+        if (match) project.tvl = match.chainTvls?.['IOTA'] ?? null;
       }
 
       // Add L2 EVM projects that aren't already in the L1 list
@@ -505,8 +505,10 @@ export class EcosystemService implements OnModuleInit {
 
         // Skip if already matched to an L1 project
         if (existingNames.has(proto.name.toLowerCase())) continue;
-        // Skip multi-chain projects where IOTA is minor (TVL < $1000)
-        if ((proto.tvl ?? 0) < 100) continue;
+        // Only count the IOTA EVM slice, not the protocol's cross-chain total
+        const chainTvl = proto.chainTvls?.['IOTA EVM'] ?? 0;
+        // Skip protocols where the IOTA EVM slice is below the $100 floor
+        if (chainTvl < 100) continue;
 
         const llamaSlug = (proto.slug || proto.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         projects.push({
@@ -523,7 +525,7 @@ export class EcosystemService implements OnModuleInit {
           events: 0,
           eventsCapped: false,
           modules: [],
-          tvl: proto.tvl ?? null,
+          tvl: chainTvl,
           logo: null,
           team: null,
           disclaimer: null,

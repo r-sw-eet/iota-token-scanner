@@ -200,8 +200,8 @@ const mainCurlExamples = [
   },
   {
     label: 'Get DefiLlama TVL for all IOTA protocols',
-    description: 'Fetch all protocols and filter for IOTA/IOTA EVM chains. This is how we get L2 EVM project data.',
-    command: 'curl -s \'https://api.llama.fi/protocols\' | \\\n  python3 -c "import json,sys; [print(p[\'name\'], p[\'tvl\']) for p in json.load(sys.stdin) if any(c in p.get(\'chains\',[]) for c in [\'IOTA\',\'IOTA EVM\'])]"',
+    description: 'Fetch all protocols and filter for IOTA/IOTA EVM chains, printing only the IOTA-chain slice (not the cross-chain total). This is how we populate L1 TVL and L2 EVM project data.',
+    command: 'curl -s \'https://api.llama.fi/protocols\' | \\\n  python3 -c "import json,sys; [print(p[\'name\'], p.get(\'chainTvls\',{}).get(\'IOTA EVM\', p.get(\'chainTvls\',{}).get(\'IOTA\', 0))) for p in json.load(sys.stdin) if any(c in p.get(\'chains\',[]) for c in [\'IOTA\',\'IOTA EVM\'])]"',
   },
 ]
 
