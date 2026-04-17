@@ -99,7 +99,7 @@ let observer: IntersectionObserver | null = null
 function scrollToSection(id: string) {
   const el = document.getElementById(id)
   if (!el) return
-  if (['network', 'economics', 'ecosystem', 'how-it-works', 'developers'].includes(id)) {
+  if (['network', 'economics', 'ecosystem', 'architecture', 'developers'].includes(id)) {
     activeSection.value = id
   }
   // Ecosystem section has an extra sub-tier row in the sticky nav, so reserve more space
@@ -130,7 +130,7 @@ const navItems = [
   { id: 'network', label: 'Network' },
   { id: 'ecosystem', label: 'Ecosystem' },
   { id: 'economics', label: 'Economics' },
-  { id: 'how-it-works', label: 'Architecture' },
+  { id: 'architecture', label: 'Architecture' },
   { id: 'developers', label: 'Developers' },
 ]
 
@@ -862,7 +862,7 @@ const projectStorageChartOptions = {
         <!-- ==================================================== -->
         <!-- === HOW IT WORKS                                  === -->
         <!-- ==================================================== -->
-        <section id="how-it-works" class="mb-16 scroll-mt-20">
+        <section id="architecture" class="mb-16 scroll-mt-20">
           <div class="mb-8">
             <h2 class="text-2xl font-bold text-[#f4f4f5] mb-1">Architecture</h2>
             <p class="text-[#71717a] text-sm">What we mean by "package", "module", "object", and "event" — and how a single user action on-chain turns into the numbers on this page.</p>
