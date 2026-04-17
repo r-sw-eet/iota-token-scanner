@@ -4,7 +4,6 @@
 
 - [ ] Add devnet support (alongside mainnet)
 - [ ] Set up backups (restic → Hetzner Object Storage; enable `iota_trade_scanner_backup_enabled` once S3 creds provisioned)
-- [ ] Add tests (API unit/integration, website component tests)
 
 ## Indexing depth
 
