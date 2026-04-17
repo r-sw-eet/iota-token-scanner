@@ -368,9 +368,21 @@ export class EcosystemService implements OnModuleInit {
   private async fetchFull() {
     const allPackages = await this.getAllPackages();
 
+    // Framework packages (0x1, 0x2, 0x3, …) are skipped by default because
+    // their generic module names would collide with too many matchers. But
+    // packages explicitly claimed via `packageAddresses` in a ProjectDefinition
+    // are allowed through — e.g. native staking on 0x3.
+    const claimedAddresses = new Set<string>();
+    for (const def of ALL_PROJECTS) {
+      for (const addr of def.match.packageAddresses ?? []) {
+        claimedAddresses.add(addr.toLowerCase());
+      }
+    }
+
     const projectMap = new Map<string, { def: ProjectDefinition; packages: PackageInfo[]; splitDeployer?: string }>();
     for (const pkg of allPackages) {
-      if (pkg.address.startsWith('0x000000000000000000000000000000000000000000000000000000000000000')) continue;
+      if (pkg.address.startsWith('0x000000000000000000000000000000000000000000000000000000000000000')
+        && !claimedAddresses.has(pkg.address.toLowerCase())) continue;
       const mods = new Set((pkg.modules?.nodes || []).map((m) => m.name));
       let def = this.matchProject(mods, pkg.address);
       // When the synchronous match is an aggregate bucket, consult fingerprint
