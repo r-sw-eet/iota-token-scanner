@@ -20,6 +20,6 @@ export const poolsFarming: ProjectDefinition = {
   urls: [
     { label: 'App', href: 'https://pools.finance' },
   ],
-  teamId: 'pools-farming',
+  teamId: 'pools-finance',
   match: { all: ['farm', 'irt'] },
 };

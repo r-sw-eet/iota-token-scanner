@@ -1,3 +1,3 @@
-export { poolsFinance, poolsFarming } from './pools-finance';
-export { virtue, virtuePool } from './virtue';
+export { poolsFinance } from './pools-finance';
+export { virtue } from './virtue';
 export { swirl } from './swirl';

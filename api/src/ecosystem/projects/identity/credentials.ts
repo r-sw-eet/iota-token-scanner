@@ -6,6 +6,6 @@ export const credentials: ProjectDefinition = {
   category: 'Identity',
   description: 'Verifiable credentials protocol on IOTA Rebased. Issues, holds, and verifies digital credentials with on-chain trust anchors. Enables portable identity attestations across applications.',
   urls: [],
-  teamId: 'if-identity',
+  teamId: 'iota-foundation',
   match: { exact: ['credentials', 'identity', 'trust'] },
 };

@@ -1,13 +1,13 @@
 import { Team } from './team.interface';
 
-import { poolsFinance, poolsFarming, virtue, virtuePool, swirl } from './defi/_index';
-import { ifTlip, ifNotarization, ifTraceability, salus } from './trade/_index';
-import { ifIdentity, oid } from './identity/_index';
+import { poolsFinance, virtue, swirl } from './defi/_index';
+import { ifTlip, salus } from './trade/_index';
+import { oid } from './identity/_index';
 import { ibtc, layerzero, wormholeFoundation } from './bridges/_index';
 import { switchboard } from './oracles/_index';
 import { tradeport } from './nft/_index';
 import { gambling } from './games/_index';
-import { ifTesting, ifCore, studioB8b1, studio0a0d, easyPublish, pointsSystem, boltProtocol, stakingGeneric } from './misc/_index';
+import { ifTesting, iotaFoundation, studioB8b1, studio0a0d, easyPublish, pointsSystem, boltProtocol, stakingGeneric } from './misc/_index';
 
 /**
  * Team registry. Every project references exactly one team via `teamId`.
@@ -23,15 +23,15 @@ import { ifTesting, ifCore, studioB8b1, studio0a0d, easyPublish, pointsSystem, b
  */
 export const ALL_TEAMS: Team[] = [
   // DeFi
-  poolsFinance, poolsFarming,
-  virtue, virtuePool,
+  poolsFinance,
+  virtue,
   swirl,
 
   // Trade
-  ifTlip, ifNotarization, ifTraceability, salus,
+  ifTlip, salus,
 
   // Identity
-  ifIdentity, oid,
+  oid,
 
   // Bridges
   ibtc, layerzero, wormholeFoundation,
@@ -45,8 +45,11 @@ export const ALL_TEAMS: Team[] = [
   // Games
   gambling,
 
-  // Misc — IF testing, anonymous studios, and single-project teams
-  ifTesting, ifCore,
+  // IOTA Foundation (consolidated: chain primitives + Identity + Notarization + Traceability)
+  iotaFoundation,
+
+  // Misc — IF testing (kept separate for NFT-bucket routing), anonymous studios, single-project teams
+  ifTesting,
   studioB8b1, studio0a0d,
   easyPublish, pointsSystem, boltProtocol, stakingGeneric,
 ];
