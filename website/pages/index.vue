@@ -13,6 +13,9 @@ const ecosystemLoading = ref(true)
 const l1Visible = ref(10)
 const l2Visible = ref(10)
 const teamsVisible = ref(10)
+const l1EventsChartVisible = ref(10)
+const l1StorageChartVisible = ref(10)
+const l2TvlChartVisible = ref(10)
 const shadeTeamless = ref(true)
 const hideIotaFoundation = ref(true)
 
@@ -324,16 +327,36 @@ const inflationChartOptions = {
   plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx: any) => `${formatIota(ctx.raw)} IOTA` } } },
 }
 
-const chartVisible = ref(10)
 const colors = ['#14b8a6', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1']
 
-const allEventProjects = computed(() => {
+const l1EventProjects = computed(() =>
+  l1Filtered.value.filter((p: any) => p.events > 0).sort((a: any, b: any) => b.events - a.events),
+)
+const l1StorageProjects = computed(() =>
+  l1Filtered.value.filter((p: any) => p.storageIota > 0.01).sort((a: any, b: any) => b.storageIota - a.storageIota),
+)
+const l2TvlProjects = computed(() => {
   if (!ecosystem.value) return []
-  return [...(ecosystem.value.l1 || []), ...(ecosystem.value.l2 || [])].filter((p: any) => p.events > 0).sort((a: any, b: any) => b.events - a.events)
+  return [...(ecosystem.value.l2 || [])].filter((p: any) => (p.tvl ?? 0) > 0).sort((a: any, b: any) => (b.tvl || 0) - (a.tvl || 0))
 })
-const allStorageProjects = computed(() => {
-  if (!ecosystem.value) return []
-  return [...(ecosystem.value.l1 || []), ...(ecosystem.value.l2 || [])].filter((p: any) => p.storageIota > 0.01).sort((a: any, b: any) => b.storageIota - a.storageIota)
+
+const l1Stats = computed(() => {
+  const projects = l1Filtered.value
+  const teamIds = new Set<string>()
+  let events = 0, storage = 0
+  for (const p of projects) {
+    if (p.team?.id) teamIds.add(p.team.id)
+    events += p.events || 0
+    storage += p.storageIota || 0
+  }
+  return { projects: projects.length, teams: teamIds.size, events, storage }
+})
+
+const l2Stats = computed(() => {
+  const projects = ecosystem.value?.l2 || []
+  let tvl = 0
+  for (const p of projects) tvl += p.tvl || 0
+  return { projects: projects.length, tvl }
 })
 
 // Teams view: aggregate all projects (L1+L2) by attributed team
@@ -368,24 +391,23 @@ const teamsAggregated = computed(() => {
 const teamsSorted = computed(() => sortRows(teamsAggregated.value, teamsSort.value))
 
 const projectEventsChartData = computed(() => {
-  const sliced = allEventProjects.value.slice(0, chartVisible.value)
+  const sliced = l1EventProjects.value.slice(0, l1EventsChartVisible.value)
   if (!sliced.length) return null
   return {
     labels: sliced.map((p: any) => p.name),
-    datasets: [{ label: 'Events', data: sliced.map((p: any) => p.events), backgroundColor: sliced.map((_: any, i: number) => colors[i % colors.length] + '80'), borderColor: sliced.map((_: any, i: number) => colors[i % colors.length]), borderWidth: 1 }],
+    datasets: [{ data: sliced.map((p: any) => p.events), backgroundColor: sliced.map((_: any, i: number) => colors[i % colors.length] + '80'), borderColor: sliced.map((_: any, i: number) => colors[i % colors.length]), borderWidth: 1 }],
   }
 })
 const projectEventsChartOptions = {
-  responsive: true, maintainAspectRatio: false, indexAxis: 'y' as const,
-  scales: {
-    x: { ticks: { color: '#71717a' }, grid: { color: '#2a2a3020' } },
-    y: { ticks: { color: '#a1a1aa', font: { size: 11 } }, grid: { display: false } },
+  responsive: true, maintainAspectRatio: false,
+  plugins: {
+    legend: { position: 'right' as const, labels: { color: '#a1a1aa', padding: 8, font: { size: 10 } } },
+    tooltip: { callbacks: { label: (ctx: any) => `${ctx.label}: ${ctx.raw.toLocaleString()} events` } },
   },
-  plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx: any) => `${ctx.raw.toLocaleString()} events` } } },
 }
 
 const projectStorageChartData = computed(() => {
-  const sliced = allStorageProjects.value.slice(0, chartVisible.value)
+  const sliced = l1StorageProjects.value.slice(0, l1StorageChartVisible.value)
   if (!sliced.length) return null
   return {
     labels: sliced.map((p: any) => p.name),
@@ -397,6 +419,22 @@ const projectStorageChartOptions = {
   plugins: {
     legend: { position: 'right' as const, labels: { color: '#a1a1aa', padding: 8, font: { size: 10 } } },
     tooltip: { callbacks: { label: (ctx: any) => `${ctx.label}: ${ctx.raw.toFixed(4)} IOTA` } },
+  },
+}
+
+const projectTvlChartData = computed(() => {
+  const sliced = l2TvlProjects.value.slice(0, l2TvlChartVisible.value)
+  if (!sliced.length) return null
+  return {
+    labels: sliced.map((p: any) => p.name),
+    datasets: [{ data: sliced.map((p: any) => p.tvl), backgroundColor: sliced.map((_: any, i: number) => colors[i % colors.length] + '80'), borderColor: sliced.map((_: any, i: number) => colors[i % colors.length]), borderWidth: 1 }],
+  }
+})
+const projectTvlChartOptions = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: {
+    legend: { position: 'right' as const, labels: { color: '#a1a1aa', padding: 8, font: { size: 10 } } },
+    tooltip: { callbacks: { label: (ctx: any) => `${ctx.label}: $${formatCompact(ctx.raw)}` } },
   },
 }
 </script>
@@ -532,52 +570,58 @@ const projectStorageChartOptions = {
           <p v-if="ecosystemLoading" class="text-[#71717a] text-sm mb-6">Loading ecosystem data (scanning all mainnet packages)...</p>
           <p v-else-if="ecosystemError" class="text-status-error text-sm mb-6">Failed to load ecosystem: {{ ecosystemError }}</p>
           <template v-else-if="ecosystem">
-            <p class="text-[#71717a] text-sm mb-6">{{ ecosystem.totalProjects }} identified projects &middot; {{ teamsAggregated.length }} teams &middot; {{ ecosystem.totalEvents.toLocaleString() }} total events &middot; {{ ecosystem.totalStorageIota.toFixed(2) }} IOTA total storage</p>
-
             <!-- ============ Projects view ============ -->
             <div id="ecosystem-projects" class="scroll-mt-28" v-show="activeEcoTab === 'projects'">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-scanner-card border border-scanner-border rounded p-5">
-                  <h3 class="text-sm font-semibold text-[#a1a1aa] mb-4">Events by Project (top {{ chartVisible }})</h3>
-                  <div :style="{ height: projectEventsChartData ? `${Math.max(250, (projectEventsChartData.labels?.length || 0) * 28)}px` : '250px' }">
-                    <Bar v-if="projectEventsChartData" :data="projectEventsChartData" :options="projectEventsChartOptions" />
-                    <p v-else class="text-[#52525b] text-sm">Loading ecosystem data...</p>
-                  </div>
-                  <div v-if="chartVisible < allEventProjects.length" class="mt-4 text-center">
-                    <button @click="chartVisible += 10" class="px-3 py-1.5 text-xs text-scanner-accent border border-scanner-border rounded-xs hover:bg-scanner-elevated transition-colors">
-                      Show more ({{ allEventProjects.length - chartVisible }} remaining)
-                    </button>
-                  </div>
-                </div>
-                <div class="bg-scanner-card border border-scanner-border rounded p-5">
-                  <h3 class="text-sm font-semibold text-[#a1a1aa] mb-4">Storage Cost by Project (top {{ chartVisible }})</h3>
-                  <div class="h-72">
-                    <Doughnut v-if="projectStorageChartData" :data="projectStorageChartData" :options="projectStorageChartOptions" />
-                    <p v-else class="text-[#52525b] text-sm">Loading ecosystem data...</p>
-                  </div>
-                  <div v-if="chartVisible < allStorageProjects.length" class="mt-4 text-center">
-                    <button @click="chartVisible += 10" class="px-3 py-1.5 text-xs text-scanner-accent border border-scanner-border rounded-xs hover:bg-scanner-elevated transition-colors">
-                      Show more ({{ allStorageProjects.length - chartVisible }} remaining)
-                    </button>
-                  </div>
-                </div>
-              </div>
-
               <!-- L1 Move Projects -->
-              <div class="mb-8">
-                <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+              <div class="mb-12">
+                <div class="text-center mb-3">
                   <h3 class="text-sm font-semibold text-scanner-accent">L1 — Move VM ({{ l1Filtered.length }}{{ hideIotaFoundation && l1Filtered.length !== ecosystem.l1.length ? ` of ${ecosystem.l1.length}` : '' }} projects)</h3>
-                  <div class="flex items-center gap-4">
-                    <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Dim projects that are not attributed to a known team">
-                      <input v-model="shadeTeamless" type="checkbox" class="accent-scanner-accent" />
-                      Shade untagged
-                    </label>
-                    <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Hide all IOTA Foundation projects (chain primitives, TLIP, Notarization, Traceability, Testing, Identity)">
-                      <input v-model="hideIotaFoundation" type="checkbox" class="accent-scanner-accent" />
-                      Hide IOTA Foundation
-                    </label>
+                </div>
+                <div class="flex items-center justify-center gap-4 mb-4 flex-wrap">
+                  <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Dim projects that are not attributed to a known team">
+                    <input v-model="shadeTeamless" type="checkbox" class="accent-scanner-accent" />
+                    Shade untagged
+                  </label>
+                  <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Hide all IOTA Foundation projects (chain primitives, TLIP, Notarization, Traceability, Testing, Identity)">
+                    <input v-model="hideIotaFoundation" type="checkbox" class="accent-scanner-accent" />
+                    Hide IOTA Foundation
+                  </label>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <MetricCard label="Identified projects" :value="String(l1Stats.projects)" />
+                  <MetricCard label="Teams" :value="String(l1Stats.teams)" />
+                  <MetricCard label="Total events" :value="formatCompact(l1Stats.events)" :subtitle="l1Stats.events.toLocaleString()" />
+                  <MetricCard label="Total storage" :value="`${l1Stats.storage.toFixed(2)} IOTA`" />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div class="bg-scanner-card border border-scanner-border rounded p-5">
+                    <h4 class="text-sm font-semibold text-[#a1a1aa] mb-4">Events by Project (top {{ Math.min(l1EventsChartVisible, l1EventProjects.length) }})</h4>
+                    <div :style="{ height: `${Math.max(288, (projectEventsChartData?.labels?.length || 0) * 22 + 40)}px` }">
+                      <Doughnut v-if="projectEventsChartData" :data="projectEventsChartData" :options="projectEventsChartOptions" />
+                      <p v-else class="text-[#52525b] text-sm">No event data yet.</p>
+                    </div>
+                    <div v-if="l1EventsChartVisible < l1EventProjects.length" class="mt-4 text-center">
+                      <button @click="l1EventsChartVisible += 10" class="px-3 py-1.5 text-xs text-scanner-accent border border-scanner-border rounded-xs hover:bg-scanner-elevated transition-colors">
+                        Show more ({{ l1EventProjects.length - l1EventsChartVisible }} remaining)
+                      </button>
+                    </div>
+                  </div>
+                  <div class="bg-scanner-card border border-scanner-border rounded p-5">
+                    <h4 class="text-sm font-semibold text-[#a1a1aa] mb-4">Storage Cost by Project (top {{ Math.min(l1StorageChartVisible, l1StorageProjects.length) }})</h4>
+                    <div :style="{ height: `${Math.max(288, (projectStorageChartData?.labels?.length || 0) * 22 + 40)}px` }">
+                      <Doughnut v-if="projectStorageChartData" :data="projectStorageChartData" :options="projectStorageChartOptions" />
+                      <p v-else class="text-[#52525b] text-sm">No storage data yet.</p>
+                    </div>
+                    <div v-if="l1StorageChartVisible < l1StorageProjects.length" class="mt-4 text-center">
+                      <button @click="l1StorageChartVisible += 10" class="px-3 py-1.5 text-xs text-scanner-accent border border-scanner-border rounded-xs hover:bg-scanner-elevated transition-colors">
+                        Show more ({{ l1StorageProjects.length - l1StorageChartVisible }} remaining)
+                      </button>
+                    </div>
                   </div>
                 </div>
+
                 <div class="overflow-x-auto">
                   <table class="w-full">
                     <thead>
@@ -634,7 +678,30 @@ const projectStorageChartOptions = {
 
               <!-- L2 EVM Projects -->
               <div v-if="ecosystem.l2.length" class="mb-8">
-                <h3 class="text-sm font-semibold text-status-active mb-3">L2 — EVM ({{ ecosystem.l2.length }} projects, data from DefiLlama)</h3>
+                <h3 class="text-sm font-semibold text-status-active text-center mb-4">L2 — EVM ({{ ecosystem.l2.length }} projects, data from DefiLlama)</h3>
+
+                <div class="md:flex md:justify-center mb-6">
+                  <div class="grid grid-cols-2 gap-4 w-full md:w-[calc(50%-12px)]">
+                    <MetricCard label="Identified projects" :value="String(l2Stats.projects)" />
+                    <MetricCard label="Total TVL" :value="`$${formatCompact(l2Stats.tvl)}`" />
+                  </div>
+                </div>
+
+                <div class="md:flex md:justify-center mb-6">
+                  <div class="bg-scanner-card border border-scanner-border rounded p-5 w-full md:w-[calc(50%-12px)]">
+                    <h4 class="text-sm font-semibold text-[#a1a1aa] mb-4">TVL by Project (top {{ Math.min(l2TvlChartVisible, l2TvlProjects.length) }})</h4>
+                    <div :style="{ height: `${Math.max(288, (projectTvlChartData?.labels?.length || 0) * 22 + 40)}px` }">
+                      <Doughnut v-if="projectTvlChartData" :data="projectTvlChartData" :options="projectTvlChartOptions" />
+                      <p v-else class="text-[#52525b] text-sm">No TVL data yet.</p>
+                    </div>
+                    <div v-if="l2TvlChartVisible < l2TvlProjects.length" class="mt-4 text-center">
+                      <button @click="l2TvlChartVisible += 10" class="px-3 py-1.5 text-xs text-status-active border border-scanner-border rounded-xs hover:bg-scanner-elevated transition-colors">
+                        Show more ({{ l2TvlProjects.length - l2TvlChartVisible }} remaining)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="overflow-x-auto">
                   <table class="w-full">
                     <thead>
