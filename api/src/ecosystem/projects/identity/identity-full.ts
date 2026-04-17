@@ -8,4 +8,9 @@ export const identityFull: ProjectDefinition = {
   urls: [],
   teamId: 'iota-foundation',
   match: { all: ['wot_identity', 'file_vault', 'mailbox'] },
+  attribution: `
+On-chain evidence: Move package with \`wot_identity\`, \`file_vault\`, and \`mailbox\` modules.
+
+The comprehensive IOTA Identity deployment — Web-of-Trust verification plus an encrypted file vault plus a mailbox for peer messaging. "Identity (full)" is our disambiguator against the lighter WoT-only deployment; IOTA Foundation doesn't use this exact phrasing publicly. All three modules ship together in the IF identity stack (see iota.org docs on decentralized identity).
+`.trim(),
 };

@@ -13,4 +13,9 @@ export const iotaFramework: ProjectDefinition = {
       '0x0000000000000000000000000000000000000000000000000000000000000002',
     ],
   },
+  attribution: `
+On-chain evidence: exact package address \`0x0000…0002\` (the IOTA system framework package).
+
+System package 0x2 is assigned by the chain itself to the IOTA framework (kiosk trades, display metadata, coin operations, transfer policies). There is no "deployer" in the conventional sense — system packages are genesis-installed, so we match by literal address and attribute to the consolidated \`iota-foundation\` team. Not an ecosystem dapp; a chain primitive that receives activity from every coin/NFT/shared-object op.
+`.trim(),
 };

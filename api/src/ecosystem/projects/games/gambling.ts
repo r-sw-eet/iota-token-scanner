@@ -8,4 +8,9 @@ export const gambling: ProjectDefinition = {
   urls: [],
   teamId: 'gambling',
   match: { all: ['iota_flip', 'roulette'] },
+  attribution: `
+On-chain evidence: Move package with both \`iota_flip\` and \`roulette\` modules.
+
+Coin-flip + roulette betting contracts — the module names are literal. The deployer ships both games together; no public brand is attached, so we label the team "IOTA Flip / Roulette" as a descriptor, not as an official product name.
+`.trim(),
 };

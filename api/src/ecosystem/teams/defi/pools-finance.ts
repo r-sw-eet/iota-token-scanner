@@ -11,4 +11,7 @@ export const poolsFinance: Team = {
     '0x21303d10b1369c414f297a6297e48d6bce07bec58f251ea842c7b33779283542',
   ],
   logo: '/logos/pools-finance.svg',
+  attribution: `
+Deployer addresses identified by opening the pools.finance web app with browser devtools and reading which contract addresses its Move calls target. The three deployers correspond to the core AMM contracts (\`0x519e…800c\` and \`0xeada…88e7\`) plus the farming product (\`0x2130…3542\`). The farming deployer was originally tracked as a separate \`pools-farming\` team; merged back in because it's the same organization shipping a second product.
+`.trim(),
 };

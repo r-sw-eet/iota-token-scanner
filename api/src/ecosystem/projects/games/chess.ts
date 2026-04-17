@@ -8,4 +8,9 @@ export const chess: ProjectDefinition = {
   urls: [],
   teamId: 'studio-b8b1',
   match: { all: ['chess'] },
+  attribution: `
+On-chain evidence: Move package with module \`chess\`.
+
+"Chess" is our descriptive label — the module name is literal, and the deployer is Studio 0xb8b1380e, an anonymous but prolific developer we've identified by deployer prefix. The same studio ships Tic-Tac-Toe, 2048, Gift Drop, and the Vault module, so we grouped them under a single synthetic studio team.
+`.trim(),
 };

@@ -8,4 +8,9 @@ export const tokenSale: ProjectDefinition = {
   urls: [],
   teamId: 'studio-0a0d',
   match: { any: ['spec_sale_multicoin', 'spec_sale_v2'] },
+  attribution: `
+On-chain evidence: Move package containing at least one of \`spec_sale_multicoin\` or \`spec_sale_v2\`.
+
+"Token Sale" is our descriptive label. The two module names correspond to the v1 (multicoin) and v2 iterations of the same launchpad contract — \`module:any\` match covers both. Deployed by Studio 0x0a0d4c9a (same anonymous studio as Marketplace Escrow).
+`.trim(),
 };

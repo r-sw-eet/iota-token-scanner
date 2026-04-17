@@ -10,4 +10,7 @@ export const wormholeFoundation: Team = {
   ],
   deployers: ['0x610a7c8f0e7cb73d3c93d1b4919de1b76fc30a8efa8e967ccdbb1f7862ee6d27'],
   logo: '/logos/wormhole.ico',
+  attribution: `
+One deployer that publishes both the Wormhole core messaging contract (modules \`consumed_vaas\` + \`cursor\`) and Pyth Network's \`batch_price_attestation\` package. That's expected — Pyth prices ride Wormhole's messaging layer, and the Wormhole Foundation operates both on IOTA. The shared deployer is documented in Pyth's IOTA integration docs (docs.pyth.network).
+`.trim(),
 };

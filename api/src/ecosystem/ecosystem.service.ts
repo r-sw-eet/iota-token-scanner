@@ -39,6 +39,8 @@ export interface Project {
   anomalousDeployers: string[];
   /** Unique sender addresses seen across this project's modules since first scan. */
   uniqueSenders: number;
+  /** Prose explaining how this project's display name was derived (shown only on the details page). */
+  attribution: string | null;
 }
 
 interface PackageInfo {
@@ -475,6 +477,7 @@ export class EcosystemService implements OnModuleInit {
         detectedDeployers,
         anomalousDeployers,
         uniqueSenders: projectSenders.size,
+        attribution: def.attribution ?? null,
       });
     }
 
@@ -532,6 +535,7 @@ export class EcosystemService implements OnModuleInit {
           detectedDeployers: [],
           anomalousDeployers: [],
           uniqueSenders: 0,
+          attribution: null,
         });
       }
     } catch (e) {

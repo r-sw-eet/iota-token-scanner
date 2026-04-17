@@ -8,4 +8,9 @@ export const giftDrop: ProjectDefinition = {
   urls: [],
   teamId: 'studio-b8b1',
   match: { all: ['giftdrop_iota'] },
+  attribution: `
+On-chain evidence: Move package with module \`giftdrop_iota\`.
+
+"Gift Drop" is our descriptive label for a claimable-voucher airdrop contract. The module name is literal (IOTA-flavored suffix). Deployed by Studio 0xb8b1380e, the same anonymous studio that ships the games bundle.
+`.trim(),
 };

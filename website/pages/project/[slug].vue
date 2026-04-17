@@ -172,6 +172,24 @@ function copyToClipboard(text: string) {
         <div><span class="font-semibold">Aggregate bucket:</span> {{ project.disclaimer }}</div>
       </div>
 
+      <!-- Attribution: how we arrived at the project's name and team -->
+      <section v-if="project.attribution || project.team?.attribution" class="mb-8">
+        <h2 class="text-lg font-bold text-[#f4f4f5] mb-3">Why we call this {{ project.name }}</h2>
+        <div class="bg-scanner-card border border-scanner-border rounded p-5 space-y-4">
+          <div v-if="project.attribution">
+            <h3 class="text-sm font-semibold text-[#e4e4e7] mb-2">Project attribution</h3>
+            <p class="text-sm text-[#a1a1aa] whitespace-pre-wrap leading-relaxed">{{ project.attribution }}</p>
+          </div>
+          <div v-if="project.team?.attribution">
+            <h3 class="text-sm font-semibold text-[#e4e4e7] mb-2">Team attribution — {{ project.team.name }}</h3>
+            <p class="text-sm text-[#a1a1aa] whitespace-pre-wrap leading-relaxed">{{ project.team.attribution }}</p>
+          </div>
+          <p class="text-xs text-[#52525b] pt-2 border-t border-scanner-border-subtle">
+            These are our best-effort attributions, not on-chain facts. The chain gives us module names, package addresses, and deployer addresses; the mapping from those to branded project names is human research. See <a href="https://github.com/r-sw-eet/iota-trade-scanner/blob/main/project-mapping.md" target="_blank" rel="noopener" class="text-scanner-accent hover:underline">project-mapping.md</a> for the full methodology.
+          </p>
+        </div>
+      </section>
+
       <!-- Project-specific identification (deployers detected on-chain) -->
       <section v-if="project.layer === 'L1' && project.detectedDeployers?.length" class="mb-8">
         <h2 class="text-lg font-bold text-[#f4f4f5] mb-3">Identification</h2>

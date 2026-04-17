@@ -8,4 +8,9 @@ export const nftLaunchpad: ProjectDefinition = {
   urls: [],
   teamId: 'tradeport',
   match: { all: ['launchpad', 'mint_box'] },
+  attribution: `
+On-chain evidence: Move package with both \`launchpad\` and \`mint_box\` modules.
+
+Tradeport ships a companion NFT launchpad product alongside its marketplace. \`mint_box\` is a Tradeport-specific term for their randomized mint mechanic. Attributed to the Tradeport team because the launchpad package shares deployer addresses with the main Tradeport marketplace package — same organization, second product line.
+`.trim(),
 };

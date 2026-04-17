@@ -12,4 +12,9 @@ export const pythOracle: ProjectDefinition = {
   teamId: 'wormhole-foundation',
   logo: '/logos/pyth.png',
   match: { all: ['batch_price_attestation'] },
+  attribution: `
+On-chain evidence: Move package with module \`batch_price_attestation\`.
+
+Pyth Network's on-chain price-feed contracts use VAAs (Wormhole-delivered) carrying batched price updates. \`batch_price_attestation\` is the literal Pyth module name (see Pyth's IOTA integration docs at docs.pyth.network). The deployer is shared with Wormhole because Pyth prices ride Wormhole's messaging layer — the Wormhole Foundation operates both on IOTA.
+`.trim(),
 };

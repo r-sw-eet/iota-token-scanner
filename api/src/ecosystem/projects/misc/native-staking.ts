@@ -13,4 +13,9 @@ export const nativeStaking: ProjectDefinition = {
       '0x0000000000000000000000000000000000000000000000000000000000000003',
     ],
   },
+  attribution: `
+On-chain evidence: exact package address \`0x0000…0003\` (the IOTA staking system package).
+
+System package 0x3 is the protocol-level staking / validator-management / epoch-transition primitive, genesis-installed. Same deployment model as \`0x2\` — no deployer address, matched by literal address, attributed to the consolidated \`iota-foundation\` team. Every IOTA staker's delegation (via Firefly or any wallet) flows through this package.
+`.trim(),
 };

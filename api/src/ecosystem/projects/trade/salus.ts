@@ -18,4 +18,11 @@ export const salus: ProjectDefinition = {
       tag: 'salus',
     },
   },
+  attribution: `
+On-chain evidence:
+- Primary: package at exact address \`0xf5e4…a90f\`.
+- Fingerprint (for catching upgraded/new Salus packages automatically): a Move object of type \`<pkg>::nft::NFT\` whose \`issuer\` field equals Salus's deployer and whose \`tag\` field equals \`"salus"\`.
+
+Salus Platform tokenizes physical commodities (metal ore, raw materials) as Digital Warehouse Receipts on IOTA. The address is hardcoded because Salus publishes discrete product packages; the fingerprint catches future deployments from the same issuer under the same \`tag="salus"\` marker. Confirmed from salusplatform.com, which openly references their IOTA mainnet deployment.
+`.trim(),
 };

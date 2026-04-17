@@ -8,4 +8,9 @@ export const ticTacToe: ProjectDefinition = {
   urls: [],
   teamId: 'studio-b8b1',
   match: { all: ['tic_tac_iota'] },
+  attribution: `
+On-chain evidence: Move package with module \`tic_tac_iota\`.
+
+"Tic Tac Toe" is our descriptive label for a package whose module name is an IOTA-flavored pun on the game. Deployed by Studio 0xb8b1380e, the same anonymous studio behind several other on-chain games.
+`.trim(),
 };

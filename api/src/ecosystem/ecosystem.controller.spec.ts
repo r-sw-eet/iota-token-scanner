@@ -49,6 +49,7 @@ describe('EcosystemController', () => {
     detectedDeployers: [],
     anomalousDeployers: [],
     uniqueSenders: 0,
+    attribution: null,
     ...overrides,
   });
 

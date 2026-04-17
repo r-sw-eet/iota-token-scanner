@@ -13,4 +13,7 @@ export const virtue: Team = {
     '0xf67d0193e9cd65c3c8232dbfe0694eb9e14397326bdc362a4fe9d590984f5a12',
   ],
   logo: '/logos/virtue.svg',
+  attribution: `
+Main deployer (\`0x14ef…c3e0\`) identified from the virtue.money app — its mint / borrow / repay flows call into this address. The second deployer (\`0xf67d…5a12\`) publishes a smaller balance-accounting package that used to be tracked as a separate team (\`virtue-pool\`); merged into Virtue because it ships the same stability-pool system under the same brand.
+`.trim(),
 };

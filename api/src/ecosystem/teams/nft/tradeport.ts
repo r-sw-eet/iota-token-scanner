@@ -10,4 +10,7 @@ export const tradeport: Team = {
     '0xae24ce73cd653c8199bc24afddc0c4ddbf0e9901d504c3b41066a6a396e8bf1e',
   ],
   logo: '/logos/tradeport.svg',
+  attribution: `
+Both deployer addresses identified by inspecting the tradeport.xyz marketplace — its bid/list/buy flows call into packages under these addresses. The two deployers host the marketplace contract (\`tradeport_biddings\`) and the companion NFT Launchpad (\`launchpad\` + \`mint_box\`). Tradeport's IOTA support is publicly listed on tradeport.xyz.
+`.trim(),
 };

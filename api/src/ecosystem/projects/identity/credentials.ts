@@ -8,4 +8,9 @@ export const credentials: ProjectDefinition = {
   urls: [],
   teamId: 'iota-foundation',
   match: { exact: ['credentials', 'identity', 'trust'] },
+  attribution: `
+On-chain evidence: Move package whose module set is exactly \`{credentials, identity, trust}\`.
+
+Part of the IOTA Foundation identity stack. The three-module exact-set signature differentiates it from the broader Identity (full) package. "Credentials" is our descriptive name; the IF identity team doesn't market this as a standalone product separately from their other identity offerings. Routed to the consolidated \`iota-foundation\` team.
+`.trim(),
 };

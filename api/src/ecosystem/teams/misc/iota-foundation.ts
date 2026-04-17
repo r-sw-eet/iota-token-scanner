@@ -29,4 +29,9 @@ export const iotaFoundation: Team = {
     // Chain primitives: system packages 0x2 / 0x3 have no conventional deployer
     // and are matched by package address, not by deployer.
   ],
+  attribution: `
+Consolidated team covering the IOTA Foundation's chain-primitive packages plus their Identity, Notarization, and Traceability product lines. All deployers are IF-operated addresses identified from IF-published documentation and cross-referenced with the module signatures we match (Identity modules, \`dynamic_notarization\`, \`traceability\`). Chain primitives (\`0x0…0002\`, \`0x0…0003\`) have no deployer address — they're genesis-installed system packages matched by literal address.
+
+Carve-outs: \`if-tlip\` stays separate because TLIP is a distinct public brand; \`if-testing\` stays separate because its single-project setup is what enables the NFT Collections → IF Testing deployer-routing rule.
+`.trim(),
 };

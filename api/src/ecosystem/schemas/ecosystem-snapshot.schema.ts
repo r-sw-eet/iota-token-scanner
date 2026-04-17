@@ -23,6 +23,7 @@ export class ProjectDoc {
   @Prop({ type: [String] }) detectedDeployers: string[];
   @Prop({ type: [String] }) anomalousDeployers: string[];
   @Prop({ default: 0 }) uniqueSenders: number;
+  @Prop({ type: String, default: null }) attribution: string | null;
 }
 
 @Schema({ timestamps: true })

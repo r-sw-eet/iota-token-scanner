@@ -10,6 +10,15 @@ export const poolsFinance: ProjectDefinition = {
   ],
   teamId: 'pools-finance',
   match: { all: ['amm_config', 'amm_router'] },
+  attribution: `
+On-chain evidence: a single Move package contains both \`amm_config\` and \`amm_router\` modules.
+
+"Pools Finance" is not on-chain — it's our label. We believe packages with this module pair are Pools Finance because:
+
+- \`amm_router\` + \`amm_config\` is the canonical naming pattern for a constant-product AMM (router handles swap routing; config holds pool parameters).
+- The deployers are the addresses the pools.finance web app calls into — observable by opening their app with browser devtools and inspecting RPC payloads.
+- Pools Finance is the first (and so far only) DEX on IOTA Rebased. No other IOTA team has published a package with these two module names at the deployer addresses we've registered.
+`.trim(),
 };
 
 export const poolsFarming: ProjectDefinition = {
@@ -22,4 +31,13 @@ export const poolsFarming: ProjectDefinition = {
   ],
   teamId: 'pools-finance',
   match: { all: ['farm', 'irt'] },
+  attribution: `
+On-chain evidence: a single Move package contains both \`farm\` and \`irt\` modules.
+
+Same team as Pools Finance, different product package. Confirmed by:
+
+- \`irt\` matches Pools Finance's public branding for the farming reward token (see pools.finance docs).
+- The farming package is deployed from a dedicated address that the pools.finance app uses for farming interactions.
+- That deployer is merged into the main \`pools-finance\` team. This project row stays separate so farming activity (LP stake / unstake / harvest) is distinguishable from DEX swaps.
+`.trim(),
 };
