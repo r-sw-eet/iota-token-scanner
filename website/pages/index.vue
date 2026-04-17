@@ -864,7 +864,7 @@ const projectStorageChartOptions = {
         <!-- ==================================================== -->
         <section id="how-it-works" class="mb-16 scroll-mt-20">
           <div class="mb-8">
-            <h2 class="text-2xl font-bold text-[#f4f4f5] mb-1">How it works</h2>
+            <h2 class="text-2xl font-bold text-[#f4f4f5] mb-1">Architecture</h2>
             <p class="text-[#71717a] text-sm">What we mean by "package", "module", "object", and "event" — and how a single user action on-chain turns into the numbers on this page.</p>
           </div>
 
