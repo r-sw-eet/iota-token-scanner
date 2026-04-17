@@ -44,8 +44,26 @@ useHead({ title: 'Privacy Policy — IOTA Trade Scanner' })
       <section>
         <h2 class="text-base font-semibold text-[#f4f4f5] mb-2">Cookies &amp; Browser Storage</h2>
         <p>
-          We do not use cookies or comparable tracking technologies. Instead, any site preferences (e.g. theme or particle toggles) are stored locally in your browser's
-          localStorage and are deleted automatically when you clear your browser data.
+          We do not use cookies. Any site preferences (e.g. theme or particle toggles) are stored locally in your browser's localStorage and are deleted automatically
+          when you clear your browser data. For the analytics script we load, see the "Web Analytics" section below.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-semibold text-[#f4f4f5] mb-2">Web Analytics</h2>
+        <p>
+          We use Plausible Analytics, a privacy-friendly, cookieless analytics service provided by Plausible Insights OÜ, Västriku tn 2, 50403 Tartu, Estonia. Plausible
+          loads a small script from <code>plausible.io</code> and records aggregated page view data (page URL, referrer, browser, operating system, device type and a
+          coarse country derived from the IP address).
+        </p>
+        <p class="mt-2">
+          Plausible does not use cookies, does not store or share personal data, does not retain IP addresses, and does not track visitors across sites or over time. All
+          data is aggregated and cannot be traced back to an individual. Data is processed on EU-hosted infrastructure.
+        </p>
+        <p class="mt-2">
+          The legal basis for this processing is our legitimate interest in understanding overall site usage to improve the service (Art. 6 (1) (f) GDPR). You can read
+          more about Plausible's data practices at
+          <a href="https://plausible.io/data-policy" class="text-scanner-accent hover:underline" target="_blank" rel="noopener">plausible.io/data-policy</a>.
         </p>
       </section>
 
