@@ -26,12 +26,23 @@ Show grouped transactions that compose a single use case:
 
 - [ ] **Attach teams to L2 (EVM) projects** — L2 entries (MagicSea, Graphene, Symmio, Gamma, Wagmi, Iolend, Velocimeter, etc.) are synthesized from the DefiLlama `/protocols` feed at scan time and hardcoded to `team: null` (`ecosystem.service.ts:512`). They have no `ProjectDefinition`, so the whole Team/teamId lookup is skipped. Options: (a) curate L1-style `ProjectDefinition`s for each L2 project and reuse the teamId path; (b) add a lightweight name → teamId lookup table run during DefiLlama enrichment. Without either, L2 logos must stay in the frontend `logoMap` rather than inherit from their team.
 
+## Activity metric — count TXs, not just events
+
+- [ ] **Add MoveCall TX counting as an activity metric alongside events.** The current metric is emitted events (`packages.nodes.modules.nodes.name` → `events(filter: { emittingModule })`). Events only fire when a Move function calls `event::emit`; many useful contracts don't emit on every call. Concrete cases:
+    - **TWIN ImmutableProof**: 2,448 `StorageCreated` events vs. 2,117+ `store_data` TXs across 6 package versions. Ratios differ because `store_data` can be called in ways that don't always create a new storage object (confirmation needed).
+    - **Salus Platform**: 60 packages with `nft` module, event count 0 on mainnet — the contract mints objects via `object::new` without emitting custom events (normal for NFT-style contracts). TXs would show real activity.
+    - **Traceability**: 6 packages, 0 events — same pattern likely.
+  GraphQL query: `transactionBlocks(filter: { function: "<pkg>::<module>::<fn>" })`. Per-function, not per-module — so each project would need a function-list enumeration, or query by package-level and aggregate.
+  Needed changes: extend `Project` interface with `transactions: number`; extend the per-package inner loop in `fetchFull` to also query TX counts; expose the metric on the details page + rankings. Optional: add a site-level toggle ("rank by events" vs "rank by TXs") since events are better for DeFi-style contracts and TXs are better for anchoring-style contracts.
+
 ## Ecosystem project-def audit
 
-Revisit after several ecosystem snapshots (to confirm the packages don't reappear post-matcher fixes):
+Revisit after several ecosystem snapshots (once enough data has landed post-2026-04-18 refactor):
 
-- [ ] **`swirlValidator`** (api/src/ecosystem/projects/defi/swirl.ts:16) — matches 0 packages on mainnet today (`all: ['cert', 'native_pool', 'validator']`). Either module names drifted, the contracts were never deployed, or the deployer renamed them. Action: verify against Swirl's latest source / confirm deployer `0x043b7d4d…` activity, then either fix the matcher or delete the def.
-- [ ] **`virtueStability`** (api/src/ecosystem/projects/defi/virtue.ts:16) — matches 0 packages on mainnet today (`all: ['stability_pool', 'borrow_incentive']`). Same triage: verify modules, check if subsumed by `virtue` / `virtuePool`, fix or drop.
+- [ ] **TokenLabs Liquid Staking (vIOTA)** (api/src/ecosystem/projects/misc/tokenlabs-viota.ts) — uses `packageAddresses` with 2 hardcoded addresses (v1, v2) because the module signature `{cert, math, native_pool, ownership, validator_set}` false-positively matches 9 non-TokenLabs packages. When TokenLabs ships vIOTA v3, add the new address.
+- [ ] **Tradeport `nft_type` package** — 1 helper package at `0xae24…bf1e` with a single `nft_type` module is currently caught by the team's deployer-match rule but not its own sub-project. Consider whether it deserves a `Tradeport NFT Type` row or stays folded into Tradeport.
+- [ ] **IOTA Identity (misc)** — 2 uncaptured Identity variants at IF deployer `0x4574…408f`: the health-lab credential package `{credentials, health_lab_simple, identity, trust}` and the individual-profile WoT package `{wot_individual_profile, wot_trust}`. Low-priority fallback bucket candidate.
+- [ ] **Spec Launchpad `spec_packs`** — Studio 0a0d / Clawnera ships a `spec_packs` module that the current Token Sale rule `{any: [spec_sale_multicoin, spec_sale_v2]}` misses. Widen the `any` list when we next touch this file.
 
 ## Update mechanism proposals
 
