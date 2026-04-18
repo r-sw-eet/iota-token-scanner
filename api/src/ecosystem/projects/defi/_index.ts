@@ -1,3 +1,5 @@
-export { poolsFinance, poolsFarming } from './pools-finance';
-export { virtue, virtueStability, virtuePool } from './virtue';
-export { swirl, swirlValidator } from './swirl';
+export { poolsFinance } from './pools-finance';
+export { virtue, virtueStabilityPool } from './virtue';
+export { swirl } from './swirl';
+export { cyberperp } from './cyberperp';
+export { iotaroyale } from './iotaroyale';

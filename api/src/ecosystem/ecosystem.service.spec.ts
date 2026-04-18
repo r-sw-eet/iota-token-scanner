@@ -82,6 +82,24 @@ jest.mock('./projects', () => {
       match: { packageAddresses: ['0x999'], fingerprint: { type: 'combo::Marker' } },
     },
     {
+      name: 'DeployerOnly',
+      layer: 'L1',
+      category: 'Test',
+      description: 'Matches every package published by a listed deployer.',
+      urls: [],
+      teamId: null,
+      match: { deployerAddresses: ['0xDEPL'] },
+    },
+    {
+      name: 'DeployerAndModule',
+      layer: 'L1',
+      category: 'Test',
+      description: 'Composition: deployer AND a required module.',
+      urls: [],
+      teamId: null,
+      match: { deployerAddresses: ['0xCOMPOSE'], all: ['gate'] },
+    },
+    {
       name: 'Aggregate',
       layer: 'L1',
       category: 'NFT',
@@ -187,8 +205,8 @@ describe('EcosystemService', () => {
   // ---------- matchProject (synchronous classifier) ----------
 
   describe('matchProject', () => {
-    const match = (mods: string[], addr = '0x0') =>
-      (service as any).matchProject(new Set(mods), addr);
+    const match = (mods: string[], addr = '0x0', deployer: string | null = null) =>
+      (service as any).matchProject(new Set(mods), addr, deployer);
 
     it('matches by package address (case-insensitive)', () => {
       expect(match([], '0xabcdef').name).toBe('AddrOnly');
@@ -197,6 +215,27 @@ describe('EcosystemService', () => {
 
     it('falls through when packageAddresses does not match', () => {
       expect(match([], '0xnope')).toBeNull();
+    });
+
+    it('matches by deployer address (case-insensitive)', () => {
+      expect(match([], '0x0', '0xdepl').name).toBe('DeployerOnly');
+      expect(match([], '0x0', '0xDEPL').name).toBe('DeployerOnly');
+    });
+
+    it('falls through when deployer does not match a deployerAddresses rule', () => {
+      expect(match([], '0x0', '0xother')).toBeNull();
+    });
+
+    it('falls through deployerAddresses rule when no deployer is available', () => {
+      expect(match([], '0x0', null)).toBeNull();
+    });
+
+    it('composes deployerAddresses + all (both must pass)', () => {
+      expect(match(['gate'], '0x0', '0xcompose').name).toBe('DeployerAndModule');
+      // Right deployer, wrong modules — rule fails, so no rule matches.
+      expect(match(['nope'], '0x0', '0xcompose')).toBeNull();
+      // Right modules, wrong deployer — rule fails.
+      expect(match(['gate'], '0x0', '0xother')).toBeNull();
     });
 
     it('matches exact module set', () => {

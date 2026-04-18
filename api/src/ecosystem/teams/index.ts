@@ -1,13 +1,13 @@
 import { Team } from './team.interface';
 
-import { poolsFinance, virtue, swirl } from './defi/_index';
-import { ifTlip, salus } from './trade/_index';
-import { oid } from './identity/_index';
-import { ibtc, layerzero, wormholeFoundation } from './bridges/_index';
+import { poolsFinance, virtue, swirl, cyberperp, iotaroyale } from './defi/_index';
+import { tlip, twinFoundation, salus } from './trade/_index';
+import { objectid } from './identity/_index';
+import { echoProtocol, layerzero, wormholeFoundation } from './bridges/_index';
 import { switchboard } from './oracles/_index';
 import { tradeport } from './nft/_index';
-import { gambling } from './games/_index';
-import { ifTesting, iotaFoundation, studioB8b1, studio0a0d, easyPublish, pointsSystem, boltProtocol, stakingGeneric } from './misc/_index';
+import { iotaFlip } from './games/_index';
+import { ifTesting, iotaFoundation, studioB8b1, studio0a0d, izipublish, liquidlink, boltEarth, tokenlabs } from './misc/_index';
 
 /**
  * Team registry. Every project references exactly one team via `teamId`.
@@ -26,15 +26,17 @@ export const ALL_TEAMS: Team[] = [
   poolsFinance,
   virtue,
   swirl,
+  cyberperp,
+  iotaroyale,
 
   // Trade
-  ifTlip, salus,
+  tlip, twinFoundation, salus,
 
   // Identity
-  oid,
+  objectid,
 
   // Bridges
-  ibtc, layerzero, wormholeFoundation,
+  echoProtocol, layerzero, wormholeFoundation,
 
   // Oracles
   switchboard,
@@ -43,15 +45,15 @@ export const ALL_TEAMS: Team[] = [
   tradeport,
 
   // Games
-  gambling,
+  iotaFlip,
 
-  // IOTA Foundation (consolidated: chain primitives + Identity + Notarization + Traceability)
+  // IOTA Foundation (consolidated: chain primitives + Identity + Notarization + Traceability + Asset Framework + Accreditation)
   iotaFoundation,
 
   // Misc — IF testing (kept separate for NFT-bucket routing), anonymous studios, single-project teams
   ifTesting,
   studioB8b1, studio0a0d,
-  easyPublish, pointsSystem, boltProtocol, stakingGeneric,
+  izipublish, liquidlink, boltEarth, tokenlabs,
 ];
 
 /** Look up a team by its id. Returns undefined if not found. */

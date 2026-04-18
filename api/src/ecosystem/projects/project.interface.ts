@@ -22,7 +22,24 @@ export interface ProjectDefinition {
   attribution?: string;
   /** Split matched packages into one sub-project per distinct deployer. Use for aggregate buckets where deployer discriminates distinct projects. */
   splitByDeployer?: boolean;
-  /** How to identify this project's packages. `packageAddresses` wins over module matchers; `fingerprint` enables auto-discovery of unknown packages by sampling a Move object's fields. */
+  /**
+   * How to identify this project's packages. All specified criteria must pass
+   * (AND semantics). A rule with no criteria is skipped by the synchronous
+   * matcher and is only reachable via `fingerprint` or team-deployer routing.
+   *
+   * Composition examples:
+   * - `{deployerAddresses: ['0x…']}` — everything from a team's deployer.
+   * - `{deployerAddresses: ['0x…'], all: ['stake']}` — staking packages
+   *   from this team specifically.
+   * - `{packageAddresses: ['0x…'], all: ['irt']}` — pin a single address and
+   *   also require the module (defence-in-depth when the address is known
+   *   but the rule should fail loudly if the deployed modules change).
+   *
+   * Priority between defs is the order of `ALL_PROJECTS`: more-specific
+   * matchers must come first so they win over broader rules on shared
+   * deployers (e.g. TWIN's `{all: ['verifiable_storage']}` before any
+   * IF-Testing team-deployer routing).
+   */
   match: {
     all?: string[];
     any?: string[];
@@ -30,6 +47,8 @@ export interface ProjectDefinition {
     minModules?: number;
     /** Exact mainnet package addresses (lowercased on compare). Use when module names are too generic to match reliably. */
     packageAddresses?: string[];
+    /** Deployer addresses (first-publisher of the package). Matches every package published by any listed deployer. Cheaper than enumerating `packageAddresses` when a team's whole footprint is on-scope. Lowercased on compare. */
+    deployerAddresses?: string[];
     /** Fingerprint a sample object from the package. All specified fields must match (AND). Enables discovery of new packages deployed by this project. */
     fingerprint?: {
       /** Struct path within the package, e.g. 'nft::NFT'. Sampled type is `<pkg>::<type>`. */

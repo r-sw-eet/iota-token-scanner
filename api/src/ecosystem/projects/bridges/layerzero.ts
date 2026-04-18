@@ -4,16 +4,20 @@ export const layerZero: ProjectDefinition = {
   name: 'LayerZero',
   layer: 'L1',
   category: 'Bridge',
-  description: 'LayerZero omnichain interoperability protocol on IOTA Rebased. Enables cross-chain messaging and asset transfers between IOTA and 150+ connected blockchains via a decentralized messaging layer.',
+  description: 'LayerZero V2 omnichain interoperability protocol on IOTA Rebased. EndpointV2, ULN302 message library, DVN/Executor workers, ZRO token, and PTB-builder infrastructure — 22 packages shipped from LayerZero\'s IOTA L1 deployer.',
   urls: [
     { label: 'Website', href: 'https://layerzero.network' },
+    { label: 'IOTA L1 docs', href: 'https://docs.layerzero.network/v2/deployments/chains/iota-l1' },
+    { label: 'Deployments API', href: 'https://metadata.layerzero-api.com/v1/metadata/deployments' },
   ],
   teamId: 'layerzero',
-  match: { any: ['endpoint_quote', 'lz_compose'] },
+  match: { deployerAddresses: ['0x8a81a6096a81fe2b722541bc19eb30e6c025732638375c362f07ea48979fd30a'] },
   attribution: `
-On-chain evidence: Move package containing at least one of \`endpoint_quote\` or \`lz_compose\`.
+On-chain evidence: deployer-match rule pinned to LayerZero's IOTA L1 deployer \`0x8a81a6…d30a\`. All 22 packages at this deployer are LayerZero V2 components.
 
-LayerZero is a publicly-documented cross-chain messaging protocol with an official IOTA deployment. The module names \`endpoint_quote\` and \`lz_compose\` are LayerZero-specific terminology (endpoint quoting and composed messaging) documented on layerzero.network. The deployer is LayerZero's core endpoint deployer — identifiable from LayerZero's public contract listings.
+Gold-standard attestation: LayerZero's own metadata API (metadata.layerzero-api.com/v1/metadata/deployments) publishes IOTA L1 under chainKey \`iotal1-mainnet\`, eid 30423, chainType \`iotamove\`, chainLayer L1. The API names specific package addresses — \`endpointV2: 0xb8e0cd76…\`, \`sendUln302 / receiveUln302: 0x042e3bb8…\`, \`executor: 0x29b691f9…\` — and 2 of the 3 are at this deployer (the executor is an operational account, not a package deployer). LayerZero's docs at docs.layerzero.network/v2/developers/iota/overview confirm the Move architecture ("Programmable Transaction Blocks and the Call pattern") that the on-chain module inventory matches exactly.
+
+Previously matched via \`{any: [endpoint_quote, lz_compose]}\`, which only caught 1 of 22 packages (the EndpointV2 core). Switched to \`deployerAddresses\` for full coverage — catches ZRO token, ULN302, DVN/Executor workers, PTB builders, OApp framework, message libraries, views, and utilities without risking future false positives on generic module names.
 `.trim(),
 };
 

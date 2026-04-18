@@ -1,1 +1,1 @@
-export { gambling } from './gambling';
+export { iotaFlip } from './iota-flip';

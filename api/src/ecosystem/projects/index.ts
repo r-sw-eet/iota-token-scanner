@@ -1,13 +1,17 @@
 import { ProjectDefinition } from './project.interface';
 
-import { poolsFinance, poolsFarming, virtue, virtueStability, virtuePool, swirl, swirlValidator } from './defi/_index';
-import { tlip, notarization, traceability, salus } from './trade/_index';
-import { identityFull, identityWot, oidIdentity, credentials } from './identity/_index';
-import { ibtcBridge, layerZero, layerZeroOft, wormhole } from './bridges/_index';
+import { poolsFinance, virtue, virtueStabilityPool, swirl, cyberperp, iotaroyale } from './defi/_index';
+import { tlip, twinImmutableProof, notarization, iotaAssetFramework, iotaAccreditationRegistry, traceability, salus } from './trade/_index';
+import { identityFull, identityWot, objectid, credentials } from './identity/_index';
+import { echoProtocolBridge, layerZero, layerZeroOft, wormhole } from './bridges/_index';
 import { pythOracle, switchboardOracle } from './oracles/_index';
 import { nftLaunchpad, tradeport, nftCollections } from './nft/_index';
-import { chess, ticTacToe, game2048, gambling } from './games/_index';
-import { marketplaceEscrow, vault, tokenSale, easyPublish, giftDrop, pointsSystem, boltProtocol, staking, nativeStaking, iotaFramework, ifTesting } from './misc/_index';
+import { chess, ticTacToe, game2048, iotaFlip } from './games/_index';
+import {
+  marketplaceEscrow, vault, tokenSale, izipublish, giftDrop, liquidlink, boltEarth,
+  tokenlabsStaking, tokenlabsVIota, tokenlabsTln, tokenlabsPayment,
+  nativeStaking, iotaFramework, ifTesting,
+} from './misc/_index';
 
 /**
  * All known project definitions, ordered by match priority.
@@ -15,31 +19,39 @@ import { marketplaceEscrow, vault, tokenSale, easyPublish, giftDrop, pointsSyste
  */
 export const ALL_PROJECTS: ProjectDefinition[] = [
   // DeFi
-  poolsFinance, poolsFarming,
-  virtue, virtueStability, virtuePool,
-  swirl, swirlValidator,
+  poolsFinance,
+  virtue, virtueStabilityPool,
+  swirl,
+  cyberperp, iotaroyale,
 
   // Trade / Enterprise
-  tlip, notarization, traceability, salus,
+  // TLIP and TWIN keep priority above IF Asset Framework / Accreditation to
+  // preserve the shared-deployer split at `0x164625aa…` (TWIN matches first
+  // on `verifiable_storage`; IF-proper products match on different modules).
+  tlip, twinImmutableProof,
+  notarization, iotaAssetFramework, iotaAccreditationRegistry,
+  traceability, salus,
 
   // Identity (identityFull before identityWot — more specific)
-  identityFull, identityWot, oidIdentity, credentials,
+  identityFull, identityWot, objectid, credentials,
 
   // Bridges
-  ibtcBridge, layerZero, layerZeroOft, wormhole,
+  echoProtocolBridge, layerZero, layerZeroOft, wormhole,
 
   // Oracles
   pythOracle, switchboardOracle,
 
-  // NFT (nftLaunchpad before nftCollections — more specific)
+  // NFT (nftLaunchpad before tradeport so the launchpad sub-product wins
+  // its `{launchpad, mint_box}` match over tradeport's deployer-catch-all)
   nftLaunchpad, tradeport, nftCollections,
 
   // Games
-  chess, ticTacToe, game2048, gambling,
+  chess, ticTacToe, game2048, iotaFlip,
 
   // Misc
-  marketplaceEscrow, vault, tokenSale, easyPublish,
-  giftDrop, pointsSystem, boltProtocol, staking,
+  marketplaceEscrow, vault, tokenSale, izipublish,
+  giftDrop, liquidlink, boltEarth,
+  tokenlabsStaking, tokenlabsVIota, tokenlabsTln, tokenlabsPayment,
   nativeStaking, iotaFramework,
   ifTesting,
 ];

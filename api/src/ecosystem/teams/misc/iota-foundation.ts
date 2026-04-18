@@ -2,19 +2,22 @@ import { Team } from '../team.interface';
 
 /**
  * Consolidated IOTA Foundation team. Owns the chain primitives (system packages
- * 0x1 / 0x2 / 0x3), the identity stack (Identity, WoT, Credentials),
- * Notarization, and Traceability. The projects remain split in the UI so each
- * product line has its own row; the team attribution unifies them here.
+ * 0x1 / 0x2 / 0x3), the identity stack (Identity, WoT, Credentials), the
+ * Identity Asset Framework, the Accreditation Registry, Notarization, and
+ * Traceability. The projects remain split in the UI so each product line has
+ * its own row; the team attribution unifies them here.
  *
- * TLIP is intentionally kept as a separate team (`if-tlip`) because it's
- * positioned as a distinct public product with its own domain (tlip.io).
+ * TLIP is intentionally kept as a separate team (`tlip`) because it's
+ * positioned as a distinct public product with its own domain (tlip.io) and
+ * TMEA partnership. TWIN Foundation is also separate — it's the Swiss
+ * parent-foundation above TLIP, with its own deployer and brand.
  * `if-testing` is also kept separate — its single-project team is what enables
  * team-deployer routing out of the NFT Collections aggregate bucket.
  */
 export const iotaFoundation: Team = {
   id: 'iota-foundation',
   name: 'IOTA Foundation',
-  description: 'IOTA Foundation — owns the chain primitives (system packages 0x2 / 0x3) plus the Identity, Notarization, and Traceability product lines on IOTA Rebased.',
+  description: 'IOTA Foundation — owns the chain primitives (system packages 0x2 / 0x3) plus the Identity, Identity Asset Framework, Accreditation Registry, Notarization, and Traceability product lines on IOTA Rebased.',
   urls: [{ label: 'IOTA Foundation', href: 'https://www.iota.org' }],
   deployers: [
     // Identity stack (was `if-identity`)
@@ -30,8 +33,10 @@ export const iotaFoundation: Team = {
     // and are matched by package address, not by deployer.
   ],
   attribution: `
-Consolidated team covering the IOTA Foundation's chain-primitive packages plus their Identity, Notarization, and Traceability product lines. All deployers are IF-operated addresses identified from IF-published documentation and cross-referenced with the module signatures we match (Identity modules, \`dynamic_notarization\`, \`traceability\`). Chain primitives (\`0x0…0002\`, \`0x0…0003\`) have no deployer address — they're genesis-installed system packages matched by literal address.
+Consolidated team covering the IOTA Foundation's chain-primitive packages plus their Identity, Identity Asset Framework, Accreditation Registry, Notarization, and Traceability product lines. All deployers are IF-operated addresses identified from IF-published documentation (iota.org/products, github.com/iotaledger/notarization, the IOTA Identity developer docs) and cross-referenced against the module signatures we match (Identity modules, \`dynamic_notarization\`, \`asset\` + \`multicontroller\` for the Identity Asset Framework, \`accreditation\` + \`property\` for the Accreditation Registry, \`traceability\`). Chain primitives (\`0x0…0002\`, \`0x0…0003\`) are matched by literal address — genesis-installed system packages have no conventional deployer.
 
-Carve-outs: \`if-tlip\` stays separate because TLIP is a distinct public brand; \`if-testing\` stays separate because its single-project setup is what enables the NFT Collections → IF Testing deployer-routing rule.
+The Notarization deployer \`0x56af…6c8f\` ships four packages: the core \`dynamic_notarization\` (Notarization row), the 16/17-module Identity Asset Framework (new row 2026-04-18), and the 7-module Accreditation Registry (new row 2026-04-18). All three are IF products but distinct enough to warrant separate rows.
+
+Carve-outs: \`tlip\` stays separate because TLIP is a distinct public brand with TMEA partnership; \`twin-foundation\` stays separate because TWIN is the Swiss parent-foundation with its own deployer (\`0x164625aa…\`) and generic \`verifiable_storage\` anchor; \`if-testing\` stays separate because its single-project setup is what enables the NFT Collections → IF Testing deployer-routing rule.
 `.trim(),
 };

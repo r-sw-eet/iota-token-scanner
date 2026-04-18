@@ -37,7 +37,7 @@ describe('Ecosystem (functional)', () => {
           eventsCapped: false,
           modules: ['ebl'],
           tvl: 0,
-          team: { id: 'if-tlip', name: 'IOTA Foundation (TLIP)' },
+          team: { id: 'tlip', name: 'TLIP' },
           urls: [],
         },
       ],
@@ -85,7 +85,7 @@ describe('Ecosystem (functional)', () => {
       await seed();
       const res = await request(app.getHttpServer()).get('/ecosystem/teams').expect(200);
       expect(Array.isArray(res.body)).toBe(true);
-      const tlipTeam = res.body.find((t: any) => t.id === 'if-tlip');
+      const tlipTeam = res.body.find((t: any) => t.id === 'tlip');
       expect(tlipTeam).toBeDefined();
       expect(tlipTeam.projects).toEqual([
         { slug: 'aa-tlip-trade', name: 'TLIP (Trade)', category: 'Trade Finance', layer: 'L1' },
@@ -97,9 +97,9 @@ describe('Ecosystem (functional)', () => {
     it('returns a single team with its projects', async () => {
       await seed();
       const res = await request(app.getHttpServer())
-        .get('/ecosystem/teams/if-tlip')
+        .get('/ecosystem/teams/tlip')
         .expect(200);
-      expect(res.body.id).toBe('if-tlip');
+      expect(res.body.id).toBe('tlip');
       expect(res.body.projects).toHaveLength(1);
     });
 

@@ -5,12 +5,15 @@ export const notarization: ProjectDefinition = {
   layer: 'L1',
   category: 'Notarization',
   description: 'On-chain document notarization service on IOTA Rebased. Supports dynamic and locked notarization modes, with timelock capabilities. Documents are anchored on-chain with cryptographic proofs of existence and timestamps.',
-  urls: [],
+  urls: [
+    { label: 'IOTA Foundation', href: 'https://www.iota.org/products/notarization' },
+    { label: 'GitHub', href: 'https://github.com/iotaledger/notarization' },
+  ],
   teamId: 'iota-foundation',
   match: { all: ['dynamic_notarization'] },
   attribution: `
 On-chain evidence: Move package with module \`dynamic_notarization\`.
 
-On-chain document notarization is one of the IOTA Foundation's flagship enterprise use cases (see iota.org). \`dynamic_notarization\` is IF-specific terminology for their mutable notarization flavor (as opposed to locked/immutable notarization). Attributed to the consolidated \`iota-foundation\` team via IF deployer addresses.
+Gold-standard attribution via the canonical IF GitHub repo \`iotaledger/notarization\` (Move sources under \`notarization-move/\`), which defines the \`dynamic_notarization\` module exactly as it appears on-chain. IF publicly endorses the product at \`iota.org/products/notarization\`. The Notarization deployer \`0x56af…6c8f\` also ships two adjacent IF products tracked separately: the Identity Asset Framework (16/17-module governance primitive) and the Accreditation Registry (7-module credential registry).
 `.trim(),
 };

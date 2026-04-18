@@ -1,4 +1,7 @@
 export { tlip } from './tlip';
+export { twinImmutableProof } from './twin-immutable-proof';
 export { notarization } from './notarization';
+export { iotaAssetFramework } from './iota-asset-framework';
+export { iotaAccreditationRegistry } from './iota-accreditation-registry';
 export { traceability } from './traceability';
 export { salus } from './salus';

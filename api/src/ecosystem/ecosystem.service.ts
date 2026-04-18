@@ -283,24 +283,47 @@ export class EcosystemService implements OnModuleInit {
     return scanned;
   }
 
-  private matchProject(mods: Set<string>, address: string): ProjectDefinition | null {
+  /**
+   * Classify a package against `ALL_PROJECTS` by AND-combining every
+   * specified criterion in the first def that passes. Priority is the
+   * order of `ALL_PROJECTS` — first match wins.
+   *
+   * A def with no synchronous criteria (empty `match`, or `match` containing
+   * only `fingerprint`) is skipped here; it's only reachable via
+   * `matchByFingerprint` or team-deployer routing downstream.
+   */
+  private matchProject(
+    mods: Set<string>,
+    address: string,
+    deployer: string | null,
+  ): ProjectDefinition | null {
     const lowerAddr = address.toLowerCase();
+    const lowerDeployer = deployer?.toLowerCase() ?? null;
     for (const def of ALL_PROJECTS) {
       const { match } = def;
+      const hasSyncCriteria =
+        (match.packageAddresses?.length ?? 0) > 0 ||
+        (match.deployerAddresses?.length ?? 0) > 0 ||
+        (match.exact?.length ?? 0) > 0 ||
+        (match.all?.length ?? 0) > 0 ||
+        (match.any?.length ?? 0) > 0 ||
+        (match.minModules ?? 0) > 0;
+      if (!hasSyncCriteria) continue;
+
       if (match.packageAddresses?.length) {
-        if (match.packageAddresses.some((a) => a.toLowerCase() === lowerAddr)) return def;
-        continue;
+        if (!match.packageAddresses.some((a) => a.toLowerCase() === lowerAddr)) continue;
       }
-      if (match.exact) {
+      if (match.deployerAddresses?.length) {
+        if (!lowerDeployer) continue;
+        if (!match.deployerAddresses.some((a) => a.toLowerCase() === lowerDeployer)) continue;
+      }
+      if (match.exact?.length) {
         const expected = new Set(match.exact);
-        if (mods.size === expected.size && [...expected].every((m) => mods.has(m))) return def;
-        continue;
+        if (mods.size !== expected.size) continue;
+        if (![...expected].every((m) => mods.has(m))) continue;
       }
-      // Defs with no synchronous matcher are only claimable via fingerprint or
-      // team-deployer routing; skip them here.
-      if (!match.all && !match.any && !match.minModules) continue;
-      if (match.all && !match.all.every((m) => mods.has(m))) continue;
-      if (match.any && !match.any.some((m) => mods.has(m))) continue;
+      if (match.all?.length && !match.all.every((m) => mods.has(m))) continue;
+      if (match.any?.length && !match.any.some((m) => mods.has(m))) continue;
       if (match.minModules && mods.size < match.minModules) continue;
       return def;
     }
@@ -386,7 +409,8 @@ export class EcosystemService implements OnModuleInit {
       if (pkg.address.startsWith('0x000000000000000000000000000000000000000000000000000000000000000')
         && !claimedAddresses.has(pkg.address.toLowerCase())) continue;
       const mods = new Set((pkg.modules?.nodes || []).map((m) => m.name));
-      let def = this.matchProject(mods, pkg.address);
+      const pkgDeployer = pkg.previousTransactionBlock?.sender?.address ?? null;
+      let def = this.matchProject(mods, pkg.address, pkgDeployer);
       // When the synchronous match is an aggregate bucket, consult fingerprint
       // first — a more-specific project may claim this package by `issuer`/`tag`.
       if (def?.splitByDeployer) {
