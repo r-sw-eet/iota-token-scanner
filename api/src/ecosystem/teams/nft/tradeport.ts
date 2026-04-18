@@ -13,6 +13,7 @@ export const tradeport: Team = {
     '0xae24ce73cd653c8199bc24afddc0c4ddbf0e9901d504c3b41066a6a396e8bf1e',
   ],
   logo: '/logos/tradeport.svg',
+  logoWordmark: '/logos/tradeport-wordmark.svg',
   attribution: `
 Organizational-grade attestation:
 

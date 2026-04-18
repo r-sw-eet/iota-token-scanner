@@ -58,4 +58,72 @@ describe('ProjectLogo', () => {
     })
     expect(wrapper.html()).toContain('w-8 h-8')
   })
+
+  it('renders project.logoWordmark when wordmark=true and one is set (landscape sizing)', async () => {
+    const wrapper = await mountSuspended(ProjectLogo, {
+      props: {
+        project: { name: 'Virtue', logo: '/logos/virtue.svg', logoWordmark: '/logos/virtue-wordmark.svg' },
+        size: 'lg',
+        wordmark: true,
+      },
+    })
+    const img = wrapper.find('img')
+    expect(img.attributes('src')).toBe('/logos/virtue-wordmark.svg')
+    // Wordmark sizing is landscape — h-* + w-auto.
+    expect(wrapper.html()).toContain('h-16 w-auto')
+    expect(wrapper.html()).not.toContain('w-16 h-16')
+  })
+
+  it('falls back to team.logoWordmark when wordmark=true and the project has none', async () => {
+    const wrapper = await mountSuspended(ProjectLogo, {
+      props: {
+        project: { name: 'Virtue Stability Pool', logo: null, team: { logo: '/logos/virtue.svg', logoWordmark: '/logos/virtue-wordmark.svg' } },
+        wordmark: true,
+      },
+    })
+    expect(wrapper.find('img').attributes('src')).toBe('/logos/virtue-wordmark.svg')
+  })
+
+  it('falls back to the square icon when wordmark=true but no wordmark is configured', async () => {
+    const wrapper = await mountSuspended(ProjectLogo, {
+      props: {
+        project: { name: 'Pools Finance', logo: '/logos/pools-finance.svg', team: { logo: '/logos/pools-finance.svg' } },
+        size: 'lg',
+        wordmark: true,
+      },
+    })
+    expect(wrapper.find('img').attributes('src')).toBe('/logos/pools-finance.svg')
+    // No wordmark available → square sizing kicks in even with wordmark=true.
+    expect(wrapper.html()).toContain('w-16 h-16')
+  })
+
+  it('applies sm landscape size when wordmark=true + size=sm', async () => {
+    const wrapper = await mountSuspended(ProjectLogo, {
+      props: {
+        project: { name: 'Virtue', logo: '/logos/virtue.svg', logoWordmark: '/logos/virtue-wordmark.svg' },
+        size: 'sm',
+        wordmark: true,
+      },
+    })
+    expect(wrapper.html()).toContain('h-8 w-auto')
+  })
+
+  it('applies default landscape size when wordmark=true + size omitted', async () => {
+    const wrapper = await mountSuspended(ProjectLogo, {
+      props: {
+        project: { name: 'Virtue', logo: '/logos/virtue.svg', logoWordmark: '/logos/virtue-wordmark.svg' },
+        wordmark: true,
+      },
+    })
+    expect(wrapper.html()).toContain('h-10 w-auto')
+  })
+
+  it('ignores logoWordmark when wordmark prop is not set (list rows stay icon-only)', async () => {
+    const wrapper = await mountSuspended(ProjectLogo, {
+      props: {
+        project: { name: 'Virtue', logo: '/logos/virtue.svg', logoWordmark: '/logos/virtue-wordmark.svg' },
+      },
+    })
+    expect(wrapper.find('img').attributes('src')).toBe('/logos/virtue.svg')
+  })
 })

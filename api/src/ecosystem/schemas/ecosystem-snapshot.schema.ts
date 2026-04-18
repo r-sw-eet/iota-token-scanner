@@ -18,6 +18,7 @@ export class ProjectDoc {
   @Prop({ type: [String] }) modules: string[];
   @Prop() tvl: number;
   @Prop() logo: string;
+  @Prop({ type: String, default: null }) logoWordmark: string | null;
   @Prop({ type: Object }) team: Record<string, any> | null;
   @Prop() disclaimer: string;
   @Prop({ type: [String] }) detectedDeployers: string[];

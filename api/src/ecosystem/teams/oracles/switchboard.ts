@@ -11,6 +11,7 @@ export const switchboard: Team = {
   ],
   deployers: ['0x55f1256ec64d7c4eacb1a5e24932b9face3cdf9400f8d828001b2da0494e7404'],
   logo: '/logos/switchboard.svg',
+  logoWordmark: '/logos/switchboard-wordmark.svg',
   attribution: `
 Gold-standard attribution via Switchboard's official IOTA documentation (\`docs.switchboard.xyz/docs-by-chain/iota\`), which publishes the mainnet package address verbatim:
 

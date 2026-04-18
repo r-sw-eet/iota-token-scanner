@@ -117,10 +117,11 @@ function copyToClipboard(text: string) {
       <!-- Header -->
       <div class="mb-8">
         <div class="flex items-center gap-4 mb-2">
-          <ProjectLogo :project="project" size="lg" />
+          <ProjectLogo :project="project" size="lg" wordmark />
           <div>
             <div class="flex items-center gap-3">
-              <h1 class="text-3xl font-bold text-[#f4f4f5]">{{ project.name }}</h1>
+              <!-- Hide the duplicated brand name when the wordmark logo already includes it. -->
+              <h1 v-if="!(project.logoWordmark || project.team?.logoWordmark)" class="text-3xl font-bold text-[#f4f4f5]">{{ project.name }}</h1>
               <span class="text-xs font-mono px-2 py-0.5 rounded-xs" :class="project.layer === 'L1' ? 'bg-scanner-accent/10 text-scanner-accent' : 'bg-status-active/10 text-status-active'">
                 {{ project.layer }}
               </span>

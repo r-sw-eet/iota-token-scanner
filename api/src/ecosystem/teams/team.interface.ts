@@ -7,8 +7,10 @@ export interface Team {
   urls?: { label: string; href: string }[];
   /** Mainnet addresses known to publish packages for this team (lowercased on compare). */
   deployers: string[];
-  /** Absolute public path to the team logo (e.g. `/logos/virtue.svg`). Inherited by every project on this team unless the project overrides via `ProjectDefinition.logo`. */
+  /** Absolute public path to the team ICON (square — e.g. `/logos/virtue.svg`). Used on list rows, team cards, and any small-size rendering. Inherited by every project on this team unless the project overrides via `ProjectDefinition.logo`. */
   logo?: string;
+  /** Optional landscape WORDMARK (icon + brand text, e.g. `/logos/virtue-wordmark.svg`). Used on project-details pages where horizontal space allows the full brand mark; falls back to `logo` when absent. */
+  logoWordmark?: string;
   /**
    * Free-form prose explaining how we established this deployer-to-team
    * mapping — what off-chain signals (website, docs, social, observed app

@@ -6,8 +6,10 @@ export interface ProjectDefinition {
   description: string;
   /** One or more URLs (website, docs, app, etc.) */
   urls: { label: string; href: string }[];
-  /** Absolute public path to the project logo, e.g. `/logos/virtue.svg`. Overrides `Team.logo` for this project only — leave unset to inherit from the team. */
+  /** Absolute public path to the project ICON (square — e.g. `/logos/virtue.svg`). Overrides `Team.logo` for this project only — leave unset to inherit from the team. */
   logo?: string;
+  /** Optional landscape WORDMARK (e.g. `/logos/virtue-wordmark.svg`). Overrides `Team.logoWordmark` for this project only — leave unset to inherit. Used on the project-details page; list views always use the square `logo`. */
+  logoWordmark?: string;
   /** ID of the owning team (references ALL_TEAMS in ../teams). `null` for aggregate buckets like NFT Collections that have no single team. */
   teamId: string | null;
   /** Optional caveat shown to users. Use for aggregate buckets that almost certainly mix distinct projects we can't yet distinguish. */

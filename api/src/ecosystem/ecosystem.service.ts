@@ -47,8 +47,10 @@ export interface Project {
   eventsCapped: boolean;
   modules: string[];
   tvl: number | null;
-  /** Resolved logo URL. Precedence: `ProjectDefinition.logo` → `Team.logo` → `null` (frontend falls back to initials). */
+  /** Resolved square icon URL. Precedence: `ProjectDefinition.logo` → `Team.logo` → `null` (frontend falls back to initials). Used on list rows, team cards, and other small renders. */
   logo: string | null;
+  /** Resolved landscape wordmark URL. Precedence: `ProjectDefinition.logoWordmark` → `Team.logoWordmark` → `null` (details page falls back to `logo`). */
+  logoWordmark: string | null;
   /** Owning team snapshot (resolved from def.teamId). `null` for aggregates / L2 */
   team: Team | null;
   /** Disclaimer text from the project definition (aggregates warn here). */
@@ -542,6 +544,7 @@ export class EcosystemService implements OnModuleInit {
         events, eventsCapped, modules: mods,
         tvl: null,
         logo: def.logo ?? team?.logo ?? null,
+        logoWordmark: def.logoWordmark ?? team?.logoWordmark ?? null,
         team,
         disclaimer: def.disclaimer ?? null,
         detectedDeployers,
@@ -613,6 +616,7 @@ export class EcosystemService implements OnModuleInit {
           modules: [],
           tvl: chainTvl,
           logo: null,
+          logoWordmark: null,
           team: null,
           disclaimer: null,
           detectedDeployers: [],

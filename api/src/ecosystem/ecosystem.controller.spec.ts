@@ -44,6 +44,7 @@ describe('EcosystemController', () => {
     modules: ['mod'],
     tvl: null,
     logo: null,
+    logoWordmark: null,
     team: { id: 'team-a', name: 'Team A' },
     disclaimer: null,
     detectedDeployers: [],
