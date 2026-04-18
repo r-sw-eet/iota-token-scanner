@@ -2,7 +2,7 @@
 
 This document is the ground-truth map from **on-chain evidence** (IOTA mainnet) to **displayed project names** (as shown on iota-trade-scanner.net). Every L1 row on the site reaches its pretty label through one of these entries. Source of truth for the code lives under `api/src/ecosystem/projects/` and `api/src/ecosystem/teams/`.
 
-For a higher-level explanation of *how* identification works, see [FAQ.md — How do you identify which project a package belongs to?](FAQ.md). For the append-only detective-work log — what each team looked like before each round of detective work and what specific evidence closed the attribution — see `handoff.md`.
+For a higher-level explanation of *how* identification works, see [FAQ.md — How do you identify which project a package belongs to?](FAQ.md). For the per-team detective-work log — what evidence closed each attribution and what residual gaps remain — see the `attribution` field on each team in `api/src/ecosystem/teams/**/*.ts` and on each project in `api/src/ecosystem/projects/**/*.ts`; the website's per-project page surfaces these in the "Why we call this …" section.
 
 ## Reading this doc
 
