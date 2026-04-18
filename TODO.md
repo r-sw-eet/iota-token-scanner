@@ -2,8 +2,10 @@
 
 ## Operational
 
+- [ ] **Dedupe probe logic between `EcosystemService` and `scan-unattributed-cli.ts`.** Both files now carry their own copy of `probeIdentityFields`, `probeTxEffects`, `matchProject`, and `matchByFingerprint` — kept in sync by hand. The CLI bypasses Nest/Mongo bootstrap so it can run via plain `ts-node` for local dev seeding (~5 min vs full app boot), which is why it diverged. Right fix: extract the pure logic into `api/src/ecosystem/probes/` (no Nest/Mongo dependencies) and have both consumers import. Until then, *every change to one must be mirrored to the other* — keep this in mind when touching probe behavior.
 - [ ] Add devnet support (alongside mainnet)
 - [ ] Set up backups (restic → Hetzner Object Storage; enable `iota_trade_scanner_backup_enabled` once S3 creds provisioned)
+- [ ] **Raise or remove the 100k package safety cap in `getAllPackages` (`api/src/ecosystem/ecosystem.service.ts:150`).** Currently caps at 2000 pages × 50 = 100k packages. Mainnet sits at ~750 today (0.7% of cap), so not urgent — but if it's ever hit we only log a `warn` and silently truncate the scan, which would degrade attribution coverage without a loud failure. Either bump to 1M, page until exhaustion with no cap, or escalate the warn to an alert/error. Mirror the same change in `api/src/scan-unattributed-cli.ts:139` (also caps at 2000 pages).
 
 ## Indexing depth
 
@@ -44,6 +46,24 @@ Open questions that could upgrade an attribution from circumstantial (🟡) or s
 - [ ] **IOTA Flip — operator identification** (api/src/ecosystem/teams/games/iota-flip.ts) — product is verified (iotaflip.netlify.app + `IotaFlipHouse` struct names) but the team is deliberately pseudonymous. Close via inspecting the SvelteKit bundle or connected-wallet flow for an operator email / ToS / X or Discord handle, or the raffle contract's admin cap owner. Low-priority unless the site starts moving non-trivial volume.
 - [ ] **Studio 0a0d — confirm Clawnera team id rename** (api/src/ecosystem/teams/misc/studios.ts) — operator identified as GitHub user `Moron1337`, brands surfaced as CLAWNERA / CLAW / SPEC, but the team id stays synthetic `studio-0a0d` pending confirmation that the operator wants to be surfaced under the Clawnera brand publicly on our site. Ask in IOTA Discord #speculations, or via the Moron1337 GitHub, whether to rename to `clawnera`.
 - [ ] **Studio 0xb8b1380e — team ownership + optional split** (api/src/ecosystem/teams/misc/studios.ts) — KrillTube + GiveRep + games + shared infrastructure are all identified at deployer `0xb8b1…06c6`, but overall team ownership is not publicly stated (single team vs. dev shop vs. IF-adjacent contractor). Close via asking in IOTA Discord whose deployer `0xb8b1…` is, or inspecting the KrillTube operator wallet `0xba1e07…020d` for branded activity tying it back. If ownership clarifies, consider splitting into `krilltube` and `giverep` sub-teams with `studio-b8b1` retained as the games/infrastructure fallback.
+
+## Unattributed → ProjectDefinitions (first pass)
+
+With the `fields` fingerprint primitive now live, turn the 16 unattributed clusters that have `sampleIdentifiers` into real `ProjectDefinition` entries. Latest snapshot (2026-04-18) shows 8–10 real brands in the set; the rest is test/noise and should be skipped.
+
+- [ ] **Write defs for the real brands.** Per cluster — write one file in `api/src/ecosystem/projects/<category>/` (and matching `teams/` entry where ownership is known). Use the new `fields` matchers rather than hardcoded `packageAddresses` where the fingerprint is stable. Candidates from the live snapshot:
+    - Healthy Gang NFT series (deployer `0xcb69…724c`, 33 pkgs, `type=…::iota_healthy_gang_::Nft`, `fields.name prefix "Healthy Gang #"`)
+    - Isla Silver NFT collection (deployer `0xfe40…2cdb`, 9 pkgs, `type=…::isla_silver::IslaSilverNFT`, `fields.name="Isla Silver"`)
+    - IOTA Estoicos (deployer `0x457d…8a38`, 7 pkgs, `type=…::estoicos::EstoicosNFT`)
+    - IOTA Names (deployer `0xfc68…3af1`, 6 pkgs, `type=…::name_registration::NameRegistration`, `fields.name_str suffix ".iota"`)
+    - ctrlv AI Agents (deployer `0xceb…999a`, 3 pkgs, `type=…::ctrlv_agent::AgentNFT`)
+    - Car NFTs (deployer `0x545…c8a9`, 3 pkgs, `type=…::car_nft::CarNFT`, `fields.brand/model/vin present:true`)
+    - TruvID (deployer `0x295e…559a`, 7 pkgs, `type=…::nft_minter2::NFT`, `fields.name prefix "TruvID"`)
+    - PANDABYTE Tickets (deployer `0x49c4…dbbf`, 3 pkgs, `type=…::voucher::PandabyteTicket`)
+    - Lil' Ape (deployer `0x03ce…419b`, 2 pkgs, `type=…::lilape_nft::LilApeNFT`, `fields.name prefix "Lil' Ape #"`)
+    - Carbon Credit Manager (deployer `0xb5fc…01a0`, 1 pkg, `type=…::credit_carbon_manager::CarbonCreditRecord`)
+  Skip as noise: `nft_minter::Nft` ("WalletStd2 / testrun123"), `iota_super::Nft` ("Token3"), `tung_tung_tung_tung_sahur_limited::Nft` ("Token2"), `nft_minter::SimpleNFT` ("My First IOTA NFT") — all look like first-mint experiments with no organizational footprint.
+- [ ] **Suggest-fingerprint CLI** (`api/src/suggest-fingerprints.ts`) — reads the latest `EcosystemSnapshot.unattributed`, emits candidate `ProjectDefinition` TS stubs per cluster that has `sampleIdentifiers` (name, teamId=null placeholder, match={fingerprint:{type, fields:{…}}}). Human reviews, keeps, commits. Build this once the first by-hand pass proves the `fields` schema actually fits the real clusters.
 
 ## Fingerprint matchers — future widening
 

@@ -436,6 +436,12 @@ export class EcosystemService implements OnModuleInit {
    * point is to surface self-attestation — e.g. Salus's `tag: "salus"` or an
    * `issuer`/`url`/`collection_name` — that a package-level ProjectDefinition
    * matcher would miss because module names are generic.
+   *
+   * Pages through up to MAX_OBJECT_PAGES * 50 objects per package because the
+   * first page is often dominated by admin caps / generic Bag wrappers / empty
+   * registries created at init — the identifying objects (NFTs, configs with
+   * brand metadata) sit further in. Short-circuits as soon as TARGET_IDENTS
+   * are collected to keep the cron budget tight.
    */
   private async probeIdentityFields(
     pkgAddress: string,
@@ -445,16 +451,27 @@ export class EcosystemService implements OnModuleInit {
       'collection_name', 'collection', 'title', 'symbol', 'ticker',
       'brand', 'url', 'website', 'publisher', 'creator', 'author',
     ]);
+    const MAX_OBJECT_PAGES = 3;
+    const TARGET_IDENTS = 3;
     const idents = new Set<string>();
     let sampledType: string | null = null;
+    let cursor: string | null = null;
 
-    try {
-      const data: any = await this.graphql(`{
-        objects(filter: { type: "${pkgAddress}" }, first: 3) {
-          nodes { asMoveObject { contents { type { repr } json } } }
-        }
-      }`);
+    for (let page = 0; page < MAX_OBJECT_PAGES; page++) {
+      const after: string = cursor ? `, after: "${cursor}"` : '';
+      let data: any;
+      try {
+        data = await this.graphql(`{
+          objects(filter: { type: "${pkgAddress}" }, first: 50${after}) {
+            nodes { asMoveObject { contents { type { repr } json } } }
+            pageInfo { hasNextPage endCursor }
+          }
+        }`);
+      } catch {
+        break;
+      }
       const nodes = data.objects?.nodes ?? [];
+      if (nodes.length === 0) break;
       for (const n of nodes) {
         const json = n.asMoveObject?.contents?.json;
         const typeRepr = n.asMoveObject?.contents?.type?.repr as string | undefined;
@@ -477,8 +494,71 @@ export class EcosystemService implements OnModuleInit {
         }
         if (idents.size >= 20) break;
       }
+      if (idents.size >= TARGET_IDENTS) break;
+      if (!data.objects?.pageInfo?.hasNextPage) break;
+      cursor = data.objects?.pageInfo?.endCursor ?? null;
+      if (!cursor) break;
+    }
+    return { identifiers: Array.from(idents), objectType: sampledType };
+  }
+
+  /**
+   * Fallback probe for logic-only packages whose own types are never owned by
+   * any object (so `probeIdentityFields` returns empty). Reads `effects
+   * .objectChanges` of one TX touching the package and harvests every
+   * non-framework `<addr>::<module>::<Type>` fragment from the changed objects'
+   * type reprs — including types from sibling packages. For a 25-package CDP
+   * protocol like Virtue (logic in this pkg, types in sibling cert/vusd
+   * packages), this surfaces `vusd::VUSD`, `cert::CERT`, etc. as
+   * `creates: <short>` identifiers that a human can pattern-match into a
+   * `ProjectDefinition`.
+   */
+  private async probeTxEffects(
+    pkgAddress: string,
+  ): Promise<{ identifiers: string[]; objectType: string | null }> {
+    const FRAMEWORK_PREFIX = '0x0000000000000000000000000000000000000000000000000000000000000';
+    const idents = new Set<string>();
+    let sampledType: string | null = null;
+
+    let data: any;
+    try {
+      data = await this.graphql(`{
+        transactionBlocks(filter: { function: "${pkgAddress}" }, first: 3) {
+          nodes {
+            effects {
+              objectChanges {
+                nodes {
+                  outputState { asMoveObject { contents { type { repr } } } }
+                }
+              }
+            }
+          }
+        }
+      }`);
     } catch {
-      // Probe is best-effort; swallow and return whatever we have.
+      return { identifiers: [], objectType: null };
+    }
+
+    const typeRe = /(0x[0-9a-f]{40,})::([a-z_][a-z0-9_]*)::([A-Z][A-Za-z0-9_]*)/g;
+    const txs = data.transactionBlocks?.nodes ?? [];
+    for (const tx of txs) {
+      const changes = tx.effects?.objectChanges?.nodes ?? [];
+      for (const ch of changes) {
+        const repr = ch.outputState?.asMoveObject?.contents?.type?.repr as string | undefined;
+        if (!repr) continue;
+        typeRe.lastIndex = 0;
+        let m: RegExpExecArray | null;
+        while ((m = typeRe.exec(repr)) !== null) {
+          const [, addr, mod, type] = m;
+          if (addr.startsWith(FRAMEWORK_PREFIX)) continue;
+          const short = `${addr.slice(0, 8)}…::${mod}::${type}`;
+          idents.add(`creates: ${short}`);
+          if (!sampledType) sampledType = `${addr}::${mod}::${type}`;
+          if (idents.size >= 20) break;
+        }
+        if (idents.size >= 20) break;
+      }
+      if (idents.size >= 20) break;
     }
     return { identifiers: Array.from(idents), objectType: sampledType };
   }
@@ -764,9 +844,33 @@ export class EcosystemService implements OnModuleInit {
       let identifiers: string[] = [];
       let objectType: string | null = null;
       if (i < UNATTRIBUTED_PROBE_CAP) {
-        const probe = await this.probeIdentityFields(latestPkg.address);
-        identifiers = probe.identifiers;
-        objectType = probe.objectType;
+        // Pass 1 — object-based probe across all packages (heaviest → lightest),
+        // short-circuit on the first package that yields anything. The cluster's
+        // `latestPkg` may be a deploy-but-uninstantiated upgrade while an
+        // earlier package owns the objects we can read identity fields from.
+        for (const pkg of [...packages].reverse()) {
+          const probe = await this.probeIdentityFields(pkg.address);
+          if (probe.identifiers.length > 0 || probe.objectType) {
+            identifiers = probe.identifiers;
+            objectType = probe.objectType;
+            break;
+          }
+        }
+        // Pass 2 — fallback for logic-only packages (e.g. CDP-style protocols
+        // where the package contains stability_pool / borrow_incentive logic
+        // but never owns objects of its own types). Reads TX effects to harvest
+        // sibling-package types (`vusd::VUSD`, `cert::CERT`, …) as identity
+        // signal. Only runs when pass 1 yielded nothing.
+        if (identifiers.length === 0 && !objectType) {
+          for (const pkg of [...packages].reverse()) {
+            const probe = await this.probeTxEffects(pkg.address);
+            if (probe.identifiers.length > 0 || probe.objectType) {
+              identifiers = probe.identifiers;
+              objectType = probe.objectType;
+              break;
+            }
+          }
+        }
       }
       unattributed.push({
         deployer,

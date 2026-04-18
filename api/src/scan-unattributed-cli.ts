@@ -96,15 +96,27 @@ async function probeIdentityFields(pkgAddress: string): Promise<{ identifiers: s
     'collection_name', 'collection', 'title', 'symbol', 'ticker',
     'brand', 'url', 'website', 'publisher', 'creator', 'author',
   ]);
+  const MAX_OBJECT_PAGES = 3;
+  const TARGET_IDENTS = 3;
   const idents = new Set<string>();
   let sampledType: string | null = null;
-  try {
-    const data: any = await graphql(`{
-      objects(filter: { type: "${pkgAddress}" }, first: 3) {
-        nodes { asMoveObject { contents { type { repr } json } } }
-      }
-    }`);
+  let cursor: string | null = null;
+
+  for (let page = 0; page < MAX_OBJECT_PAGES; page++) {
+    const after: string = cursor ? `, after: "${cursor}"` : '';
+    let data: any;
+    try {
+      data = await graphql(`{
+        objects(filter: { type: "${pkgAddress}" }, first: 50${after}) {
+          nodes { asMoveObject { contents { type { repr } json } } }
+          pageInfo { hasNextPage endCursor }
+        }
+      }`);
+    } catch {
+      break;
+    }
     const nodes = data.objects?.nodes ?? [];
+    if (nodes.length === 0) break;
     for (const n of nodes) {
       const json = n.asMoveObject?.contents?.json;
       const typeRepr = n.asMoveObject?.contents?.type?.repr as string | undefined;
@@ -126,8 +138,58 @@ async function probeIdentityFields(pkgAddress: string): Promise<{ identifiers: s
       }
       if (idents.size >= 20) break;
     }
+    if (idents.size >= TARGET_IDENTS) break;
+    if (!data.objects?.pageInfo?.hasNextPage) break;
+    cursor = data.objects?.pageInfo?.endCursor ?? null;
+    if (!cursor) break;
+  }
+  return { identifiers: Array.from(idents), objectType: sampledType };
+}
+
+async function probeTxEffects(pkgAddress: string): Promise<{ identifiers: string[]; objectType: string | null }> {
+  const FRAMEWORK_PREFIX = '0x0000000000000000000000000000000000000000000000000000000000000';
+  const idents = new Set<string>();
+  let sampledType: string | null = null;
+
+  let data: any;
+  try {
+    data = await graphql(`{
+      transactionBlocks(filter: { function: "${pkgAddress}" }, first: 3) {
+        nodes {
+          effects {
+            objectChanges {
+              nodes {
+                outputState { asMoveObject { contents { type { repr } } } }
+              }
+            }
+          }
+        }
+      }
+    }`);
   } catch {
-    // best-effort probe
+    return { identifiers: [], objectType: null };
+  }
+
+  const typeRe = /(0x[0-9a-f]{40,})::([a-z_][a-z0-9_]*)::([A-Z][A-Za-z0-9_]*)/g;
+  const txs = data.transactionBlocks?.nodes ?? [];
+  for (const tx of txs) {
+    const changes = tx.effects?.objectChanges?.nodes ?? [];
+    for (const ch of changes) {
+      const repr = ch.outputState?.asMoveObject?.contents?.type?.repr as string | undefined;
+      if (!repr) continue;
+      typeRe.lastIndex = 0;
+      let m: RegExpExecArray | null;
+      while ((m = typeRe.exec(repr)) !== null) {
+        const [, addr, mod, type] = m;
+        if (addr.startsWith(FRAMEWORK_PREFIX)) continue;
+        const short = `${addr.slice(0, 8)}…::${mod}::${type}`;
+        idents.add(`creates: ${short}`);
+        if (!sampledType) sampledType = `${addr}::${mod}::${type}`;
+        if (idents.size >= 20) break;
+      }
+      if (idents.size >= 20) break;
+    }
+    if (idents.size >= 20) break;
   }
   return { identifiers: Array.from(idents), objectType: sampledType };
 }
@@ -207,9 +269,27 @@ async function main() {
     let identifiers: string[] = [];
     let objectType: string | null = null;
     if (i < PROBE_CAP) {
-      const p = await probeIdentityFields(latestPkg.address);
-      identifiers = p.identifiers;
-      objectType = p.objectType;
+      // Mirror EcosystemService.fetchFull's two-pass probe: object-based across
+      // every package (heaviest → lightest), then TX-effects fallback for
+      // logic-only packages whose own types are never owned by any object.
+      for (const pkg of [...packages].reverse()) {
+        const p = await probeIdentityFields(pkg.address);
+        if (p.identifiers.length > 0 || p.objectType) {
+          identifiers = p.identifiers;
+          objectType = p.objectType;
+          break;
+        }
+      }
+      if (identifiers.length === 0 && !objectType) {
+        for (const pkg of [...packages].reverse()) {
+          const p = await probeTxEffects(pkg.address);
+          if (p.identifiers.length > 0 || p.objectType) {
+            identifiers = p.identifiers;
+            objectType = p.objectType;
+            break;
+          }
+        }
+      }
     }
     out.push({
       deployer,

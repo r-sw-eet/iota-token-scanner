@@ -759,6 +759,176 @@ describe('EcosystemService', () => {
       expect(res.identifiers).toEqual([]);
       expect(res.objectType).toBeNull();
     });
+
+    it('breaks immediately when the first page returns zero objects', async () => {
+      fetchMock.mockResolvedValue({
+        json: async () => ({ data: { objects: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } } } }),
+      });
+      const res = await probe('0xaa');
+      expect(res.identifiers).toEqual([]);
+      expect(res.objectType).toBeNull();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('short-circuits without paging when the first page yields enough idents', async () => {
+      // Page 1 returns 3+ idents → should not request page 2 even if hasNextPage=true.
+      fetchMock.mockResolvedValue({
+        json: async () => ({
+          data: {
+            objects: {
+              nodes: [
+                { asMoveObject: { contents: { type: { repr: '0xaa::nft::NFT' }, json: { tag: 'p1', name: 'P1', issuer: 'P1Inc' } } } },
+              ],
+              pageInfo: { hasNextPage: true, endCursor: 'NEXT' },
+            },
+          },
+        }),
+      });
+      await probe('0xaa');
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('paginates beyond the first page when fewer than 3 idents collected', async () => {
+      // Page 1 returns objects with no identifiable fields → 0 idents.
+      // Page 2 returns one object with two idents → loop terminates after page 2.
+      fetchMock
+        .mockResolvedValueOnce({
+          json: async () => ({
+            data: {
+              objects: {
+                nodes: [
+                  { asMoveObject: { contents: { type: { repr: '0xaa::admin::AdminCap' }, json: { id: '0x1' } } } },
+                ],
+                pageInfo: { hasNextPage: true, endCursor: 'CURSOR1' },
+              },
+            },
+          }),
+        })
+        .mockResolvedValueOnce({
+          json: async () => ({
+            data: {
+              objects: {
+                nodes: [
+                  { asMoveObject: { contents: { type: { repr: '0xaa::nft::NFT' }, json: { tag: 'late', name: 'Late Find' } } } },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          }),
+        });
+      const { identifiers, objectType } = await probe('0xaa');
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      // sampledType is the first non-empty type seen (page 1's AdminCap).
+      expect(objectType).toBe('0xaa::admin::AdminCap');
+      expect(identifiers).toEqual(expect.arrayContaining(['tag: late', 'name: Late Find']));
+    });
+  });
+
+  // ---------- probeTxEffects ----------
+
+  describe('probeTxEffects', () => {
+    const probe = (addr: string) => (service as any).probeTxEffects(addr);
+
+    it('extracts non-framework type fragments from TX effect objectChanges', async () => {
+      fetchMock.mockResolvedValue({
+        json: async () => ({
+          data: {
+            transactionBlocks: {
+              nodes: [{
+                effects: {
+                  objectChanges: {
+                    nodes: [
+                      // Framework-only: should be skipped entirely.
+                      { outputState: { asMoveObject: { contents: { type: { repr: '0x0000000000000000000000000000000000000000000000000000000000000002::coin::Coin<0x0000000000000000000000000000000000000000000000000000000000000002::iota::IOTA>' } } } } },
+                      // Sibling-package types (the identity signal): repr is wrapped in a
+                      // framework Coin<...>, but the inner type is non-framework and
+                      // gets harvested.
+                      { outputState: { asMoveObject: { contents: { type: { repr: '0x0000000000000000000000000000000000000000000000000000000000000002::coin::TreasuryCap<0xd3b63e603a78786facf65ff22e79701f3e824881a12fa3268d62a75530fe904f::vusd::VUSD>' } } } } },
+                      { outputState: { asMoveObject: { contents: { type: { repr: '0x346778989a9f57480ec3fee15f2cd68409c73a62112d40a3efd13987997be68c::cert::CERT' } } } } },
+                    ],
+                  },
+                },
+              }],
+            },
+          },
+        }),
+      });
+      const { identifiers, objectType } = await probe('0xb0ca');
+      expect(identifiers).toEqual(expect.arrayContaining([
+        'creates: 0xd3b63e…::vusd::VUSD',
+        'creates: 0x346778…::cert::CERT',
+      ]));
+      // Pure-framework reprs contribute nothing.
+      expect(identifiers.find((s: string) => s.includes('iota::IOTA'))).toBeUndefined();
+      expect(objectType).toBe('0xd3b63e603a78786facf65ff22e79701f3e824881a12fa3268d62a75530fe904f::vusd::VUSD');
+    });
+
+    it('returns empty on error without throwing', async () => {
+      fetchMock.mockResolvedValue({ json: async () => ({ errors: [{ message: 'boom' }] }) });
+      const res = await probe('0xaa');
+      expect(res.identifiers).toEqual([]);
+      expect(res.objectType).toBeNull();
+    });
+
+    it('returns empty when no TXs match the package filter', async () => {
+      fetchMock.mockResolvedValue({ json: async () => ({ data: { transactionBlocks: { nodes: [] } } }) });
+      const res = await probe('0xaa');
+      expect(res.identifiers).toEqual([]);
+      expect(res.objectType).toBeNull();
+    });
+
+    it('caps at 20 collected identifiers across many TX effects', async () => {
+      // 25 distinct sibling-package types across 25 changes, all non-framework
+      // — should stop adding at the 20th and break out of all loops.
+      const reprs = Array.from({ length: 25 }, (_, i) =>
+        // 64-hex addresses with varying first chars so each is unique.
+        `0x${i.toString(16).padStart(2, '0')}aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa::brand${i}::Mark`,
+      );
+      fetchMock.mockResolvedValue({
+        json: async () => ({
+          data: {
+            transactionBlocks: {
+              nodes: [{
+                effects: {
+                  objectChanges: {
+                    nodes: reprs.map((repr) => ({ outputState: { asMoveObject: { contents: { type: { repr } } } } })),
+                  },
+                },
+              }],
+            },
+          },
+        }),
+      });
+      const { identifiers } = await probe('0xaa');
+      expect(identifiers).toHaveLength(20);
+    });
+
+    it('skips object changes whose outputState has no readable type repr', async () => {
+      // Mix of: undefined outputState, missing asMoveObject, missing repr, plus
+      // one valid sibling-package type that should still be harvested.
+      fetchMock.mockResolvedValue({
+        json: async () => ({
+          data: {
+            transactionBlocks: {
+              nodes: [{
+                effects: {
+                  objectChanges: {
+                    nodes: [
+                      { outputState: null },
+                      { outputState: { asMoveObject: null } },
+                      { outputState: { asMoveObject: { contents: { type: null } } } },
+                      { outputState: { asMoveObject: { contents: { type: { repr: '0xaaa1bb2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcd::brand::Marker' } } } } },
+                    ],
+                  },
+                },
+              }],
+            },
+          },
+        }),
+      });
+      const { identifiers } = await probe('0xaa');
+      expect(identifiers).toEqual(['creates: 0xaaa1bb…::brand::Marker']);
+    });
   });
 
   // ---------- matchByFingerprint ----------
@@ -1119,6 +1289,7 @@ describe('EcosystemService', () => {
       packages: any[];
       llama?: any[] | 'error';
       objects?: Record<string, any>;
+      txEffects?: Record<string, string[]>;
       networkTx?: string;
     }) => {
       return jest.fn(async (url: string, opts: any) => {
@@ -1150,6 +1321,23 @@ describe('EcosystemService', () => {
               json: async () => ({
                 data: {
                   objects: { nodes: node ? [{ asMoveObject: { contents: { json: node } } }] : [] },
+                },
+              }),
+            };
+          }
+          if (body.includes('transactionBlocks(filter:')) {
+            const unescaped = body.replace(/\\/g, '');
+            const m = /function: "([^"]+)"/.exec(unescaped);
+            const pkg = m?.[1] ?? '';
+            const reprs = script.txEffects?.[pkg] ?? [];
+            return {
+              json: async () => ({
+                data: {
+                  transactionBlocks: {
+                    nodes: reprs.length
+                      ? [{ effects: { objectChanges: { nodes: reprs.map((repr) => ({ outputState: { asMoveObject: { contents: { type: { repr } } } } })) } } }]
+                      : [],
+                  },
                 },
               }),
             };
@@ -1660,6 +1848,37 @@ describe('EcosystemService', () => {
         'name: Mystery Thing',
       ]));
       expect(snap.totalUnattributedPackages).toBe(2);
+    });
+
+    it('falls back to TX-effects probe when the object probe finds nothing across all cluster packages', async () => {
+      // Two packages, same unknown deployer, no objects of either pkg's own
+      // types — simulates a logic-only protocol like Virtue. Pass 1 returns
+      // empty for both, pass 2 (TX-effects) finds sibling-package types via
+      // the latest pkg.
+      (global as any).fetch = scriptFetch({
+        packages: [
+          pkg({ address: '0xlogicA', modules: ['orchestration'], deployer: '0xlogicteam', storageRebate: '500000000' }),
+          pkg({ address: '0xlogicB', modules: ['orchestration'], deployer: '0xlogicteam', storageRebate: '1500000000' }),
+        ],
+        // No `objects` entries → object probe returns empty for every pkg
+        txEffects: {
+          // Latest pkg (highest storageRebate) is iterated first in reverse order
+          '0xlogicB': [
+            '0xd3b63e603a78786facf65ff22e79701f3e824881a12fa3268d62a75530fe904f::vusd::VUSD',
+            '0x346778989a9f57480ec3fee15f2cd68409c73a62112d40a3efd13987997be68c::cert::CERT',
+          ],
+        },
+      });
+      const snap = await runCapture();
+      expect(snap.unattributed).toHaveLength(1);
+      const cluster = snap.unattributed[0];
+      expect(cluster.deployer).toBe('0xlogicteam');
+      expect(cluster.sampleIdentifiers).toEqual(expect.arrayContaining([
+        'creates: 0xd3b63e…::vusd::VUSD',
+        'creates: 0x346778…::cert::CERT',
+      ]));
+      // sampledObjectType comes from the first non-framework type in TX effects
+      expect(cluster.sampledObjectType).toBe('0xd3b63e603a78786facf65ff22e79701f3e824881a12fa3268d62a75530fe904f::vusd::VUSD');
     });
 
     it('buckets unmatched packages with null deployers under the "unknown" key', async () => {
