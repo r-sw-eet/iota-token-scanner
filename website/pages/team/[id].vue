@@ -41,6 +41,13 @@ watch(id, load)
         </div>
       </div>
 
+      <section v-if="team.attribution" class="mb-10">
+        <h2 class="text-lg font-bold text-[#f4f4f5] mb-3">Attribution</h2>
+        <div class="bg-scanner-card border border-scanner-border rounded p-5">
+          <AttributionText :text="team.attribution" />
+        </div>
+      </section>
+
       <section class="mb-10">
         <h2 class="text-lg font-bold text-[#f4f4f5] mb-3">Known Deployer Addresses</h2>
         <p class="text-sm text-[#71717a] mb-3">Mainnet addresses that have published packages for this team.</p>
