@@ -19,7 +19,7 @@ Public attestation:
 - **Technical stack confirmation:** cryptonews.net explicitly states "Each of these stations has been registered and tokenized on-chain during the testing phase using the $IOTA Rebased Move VM."
 - **Specific pilot locations named in press:** Mount Austin in Johor Bahru, Malaysia; Nottingham in the United Kingdom (Bolt.Earth's "first European pilot site").
 
-On-chain: deployer \`0x1d4e…6da3\` has published 1 package (\`0x7110f3de…4d56b9\`) with 11 modules:
+On-chain: deployer \`0x1d4ec616351c6be450771d2b291c41579177218da6c5735f2c80af8661f36da3\` has published 1 package (\`0x7110f3deb0e1f78f15c81b38dca3ba7f23ecd34fa6b1f0ab4919f6a3054d56b9\`) with 11 modules:
 
 \`\`\`
 bolt

@@ -14,7 +14,7 @@ export const identityWot: ProjectDefinition = {
   attribution: `
 On-chain evidence: Move package with both \`wot_identity\` and \`wot_trust\` modules.
 
-Catches 20 of the 24 IOTA Identity packages at IF deployer \`0x4574…408f\` — everything containing both \`wot_identity\` + \`wot_trust\`:
+Catches 20 of the 24 IOTA Identity packages at IF deployer \`0x45745c3d1ef637cb8c920e2bbc8b05ae2f8dbeb28fd6fb601aea92a31f35408f\` — everything containing both \`wot_identity\` + \`wot_trust\`:
 - WoT-basic \`{wot_identity, wot_trust}\` — 6 upgrade versions.
 - WoT + identity_registry \`{identity_registry, wot_identity, wot_trust}\` — 4 versions.
 - WoT + wot_identity_registry \`{wot_identity, wot_identity_registry, wot_trust}\` — 4 versions.

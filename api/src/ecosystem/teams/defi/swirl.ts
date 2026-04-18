@@ -24,7 +24,7 @@ Gold-standard attribution via Hacken's audit report linked directly from Swirl's
 
 The chain of branding: Swirl (public) = StakeFi (Ankr's internal codename) = the audited codebase at \`Ankr-network/stakefi-iota-smart-contract\`. All three labels are explicitly bridged by the Hacken report.
 
-On-chain: deployer \`0x043b…351c\` has published exactly 4 packages, all with the identical 2-module signature \`{pool, riota}\` — four upgrade versions of the same liquid-staking core. \`pool\` is Swirl's NativePool / liquidity-pool primitive (Hacken tags: "Liquidity Pool") where IOTA gets staked; \`riota\` is the receipt-token type (a.k.a. "rIOTA" internally / CERT in Hacken's description / marketed as stIOTA to users). No other Move package on IOTA mainnet contains this exact \`{pool, riota}\` module pair. Deployer has zero off-topic packages — perfectly clean footprint for a single-product team.
+On-chain: deployer \`0x043b7d4d89c36bfcd37510aadadb90275622cf603344f39b29648c543742351c\` has published exactly 4 packages, all with the identical 2-module signature \`{pool, riota}\` — four upgrade versions of the same liquid-staking core. \`pool\` is Swirl's NativePool / liquidity-pool primitive (Hacken tags: "Liquidity Pool") where IOTA gets staked; \`riota\` is the receipt-token type (a.k.a. "rIOTA" internally / CERT in Hacken's description / marketed as stIOTA to users). No other Move package on IOTA mainnet contains this exact \`{pool, riota}\` module pair. Deployer has zero off-topic packages — perfectly clean footprint for a single-product team.
 
 Triangulation:
 - [x] Swirl's docs link to the Hacken audit as their official security review.

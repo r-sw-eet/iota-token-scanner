@@ -24,14 +24,14 @@ No single page publishes a package address directly (Tradeport's developer docs 
 
 On-chain footprint, two closely-related deployers ship a complete multi-product NFT marketplace stack — 15 packages total:
 
-**Deployer A** \`0x20d6…85f7\` (12 packages):
+**Deployer A** \`0x20d666d8e759b3c0c3a094c2bac81794e437775c7e4d3d6fe33761ae063385f7\` (12 packages):
 - 3 upgrade versions of \`tradeport_biddings\` (marketplace bidding primitive — brand literal).
 - 3 upgrade versions of \`{launchpad, mint_box, pseudorandom, signature}\` (NFT Launchpad product — pseudorandom minting + signature-based whitelist).
 - 2 versions of \`kiosk_listings\` (Kiosk-based listings).
 - 2 versions of \`kiosk_transfers\` (Kiosk-based transfers).
 - 2 versions of \`listings\` (plain listings — same module name as Aptos V1 Tradeport's \`listings\`).
 
-**Deployer B** \`0xae24…bf1e\` (3 packages):
+**Deployer B** \`0xae24ce73cd653c8199bc24afddc0c4ddbf0e9901d504c3b41066a6a396e8bf1e\` (3 packages):
 - 1 with \`{launchpad, mint_box, pseudorandom, signature}\` (same launchpad signature — deployer also ships the launchpad product).
 - 1 with 6 modules: \`{floor_price_rule, kiosk_lock_rule, personal_kiosk, personal_kiosk_rule, royalty_rule, witness_rule}\` — transfer-policy rules for the Kiosk standard (royalty enforcement, floor price, personal-kiosk lock, witness-based auth).
 - 1 with a single \`nft_type\` module — shared NFT type package.

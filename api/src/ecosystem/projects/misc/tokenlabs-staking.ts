@@ -9,7 +9,7 @@ export const tokenlabsStaking: ProjectDefinition = {
   teamId: 'tokenlabs',
   match: { all: ['stake', 'stake_config'] },
   attribution: `
-On-chain evidence: Move package with both \`stake\` and \`stake_config\` modules (usually paired with \`stake_entries\`) at TokenLabs' engine deployer \`0x9bd8…9841\`. 3 upgrade versions on mainnet.
+On-chain evidence: Move package with both \`stake\` and \`stake_config\` modules (usually paired with \`stake_entries\`) at TokenLabs' engine deployer \`0x9bd84e617831511634d8aca9120e90b07ba9e4fd920029e1fe4c887fc8599841\`. 3 upgrade versions on mainnet.
 
 The 3-module signature is textbook Liquidswap-style staking — a multi-pool framework with classic primitives:
 
@@ -22,7 +22,7 @@ stake_config (9 fn): 3-admin model (regular / emergency / treasury)
 stake_entries (15 fn): stake, unstake, harvest, compound, compound_with_extra
 \`\`\`
 
-Attribution resolved 2026-04-17 via GlobalConfig probe: queried \`::stake_config::GlobalConfig\` object \`0xad0c222b5bfe…\` and found \`admin_address = emergency_admin_address = treasury_admin_address = 0x5555679093281ffa85c51c24b55fc45ff0f1bb6a57c0bee2c61eae3d5b54ae7c\`. That vanity-prefix address holds all three admin roles and separately publishes \`tln_token\`, vIOTA liquid staking, and a \`simple_payment\` helper — identifying the team as TokenLabs. Previously registered as "Staking (generic)"; now part of the 4-row TokenLabs product line.
+Attribution resolved 2026-04-17 via GlobalConfig probe: queried \`::stake_config::GlobalConfig\` object \`0xad0c222b5bfe63b50f31fee194bab69b636ffb70556053bc42234d8734ef280e\` and found \`admin_address = emergency_admin_address = treasury_admin_address = 0x5555679093281ffa85c51c24b55fc45ff0f1bb6a57c0bee2c61eae3d5b54ae7c\`. That vanity-prefix address holds all three admin roles and separately publishes \`tln_token\`, vIOTA liquid staking, and a \`simple_payment\` helper — identifying the team as TokenLabs. Previously registered as "Staking (generic)"; now part of the 4-row TokenLabs product line.
 
 **No false-match concern:** Pools Finance's 10-module AMM packages also contain \`{stake, stake_config, stake_entries}\` (vendored from the same Liquidswap source), but the Pools Finance match rule \`{amm_config, amm_router}\` fires earlier in \`ALL_PROJECTS\` and claims those packages first. The Staking Framework rule only matches TokenLabs' 3 standalone packages.
 `.trim(),

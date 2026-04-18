@@ -14,6 +14,6 @@ export const notarization: ProjectDefinition = {
   attribution: `
 On-chain evidence: Move package with module \`dynamic_notarization\`.
 
-Gold-standard attribution via the canonical IF GitHub repo \`iotaledger/notarization\` (Move sources under \`notarization-move/\`), which defines the \`dynamic_notarization\` module exactly as it appears on-chain. IF publicly endorses the product at \`iota.org/products/notarization\`. The Notarization deployer \`0x56af…6c8f\` also ships two adjacent IF products tracked separately: the Identity Asset Framework (16/17-module governance primitive) and the Accreditation Registry (7-module credential registry).
+Gold-standard attribution via the canonical IF GitHub repo \`iotaledger/notarization\` (Move sources under \`notarization-move/\`), which defines the \`dynamic_notarization\` module exactly as it appears on-chain. IF publicly endorses the product at \`iota.org/products/notarization\`. The Notarization deployer \`0x56afb2eded3fb2cdb73f63f31d0d979c1527804144eb682c142eb93d43786c8f\` also ships two adjacent IF products tracked separately: the Identity Asset Framework (16/17-module governance primitive) and the Accreditation Registry (7-module credential registry).
 `.trim(),
 };

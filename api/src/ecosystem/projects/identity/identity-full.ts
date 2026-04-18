@@ -16,7 +16,7 @@ On-chain evidence: Move package containing \`wot_identity\`, \`file_vault\`, and
 
 Gold-standard attestation via the canonical IF GitHub org \`iotaledger\` — Identity lives at \`github.com/iotaledger/identity\` ("Implementation of the Decentralized Identity standards such as DID and Verifiable Credentials by W3C for the IOTA MoveVM"). IF also publishes the product at \`iota.org/products/identity\`.
 
-The full-stack variant matches 2 latest upgrade versions at deployer \`0x4574…408f\` — packages with the 5-module set \`{file_vault, mailbox, wot_identity, wot_identity_registry, wot_trust}\`. The 3-module match \`{wot_identity, file_vault, mailbox}\` is tight enough to uniquely identify these over the WoT-only variants.
+The full-stack variant matches 2 latest upgrade versions at deployer \`0x45745c3d1ef637cb8c920e2bbc8b05ae2f8dbeb28fd6fb601aea92a31f35408f\` — packages with the 5-module set \`{file_vault, mailbox, wot_identity, wot_identity_registry, wot_trust}\`. The 3-module match \`{wot_identity, file_vault, mailbox}\` is tight enough to uniquely identify these over the WoT-only variants.
 
 The deployer ships 24 packages across the Identity product family — this row (full stack), \`Identity (WoT)\` (6+4+4+6 versions covering the \`{wot_identity, wot_trust}\`-bearing variants), and \`Credentials\` (exact \`{credentials, identity, trust}\` pair). Two minor variants (\`{credentials, health_lab_simple, identity, trust}\` and \`{wot_individual_profile, wot_trust}\`) remain uncaptured — low-priority misc bucket candidates.
 `.trim(),

@@ -12,7 +12,7 @@ export const cyberperp: ProjectDefinition = {
   teamId: 'cyberperp',
   match: { deployerAddresses: ['0x14effa2d3435b7c462a969db6995003cfd3db97f403ad9dd769d0a36413fc3e0'] },
   attribution: `
-On-chain evidence: deployer-match rule pinned to CyberPerp's single IOTA L1 deployer \`0x14ef…c3e0\`. All 11 L1 Move packages at this deployer — the 19-module GMX-fork perps (4 upgrade versions), the \`cyb\` coin module, the 14-module OFT wrapper, 2 swap/yield-farm packages, and 3 market-only packages — are CyberPerp components.
+On-chain evidence: deployer-match rule pinned to CyberPerp's single IOTA L1 deployer \`0x14effa2d3435b7c462a969db6995003cfd3db97f403ad9dd769d0a36413fc3e0\`. All 11 L1 Move packages at this deployer — the 19-module GMX-fork perps (4 upgrade versions), the \`cyb\` coin module, the 14-module OFT wrapper, 2 swap/yield-farm packages, and 3 market-only packages — are CyberPerp components.
 
 Single-row approach chosen over sub-project splits (Perps / Swap / CYB / OFT) for readability: users looking at the L1 Move scanner expect one CyberPerp line, not four. The disclaimer above makes the L1/L2 split explicit so CyberPerp rows on the scanner (L1 via Move + L2 via DefiLlama) aren't misread as double-counting.
 `.trim(),

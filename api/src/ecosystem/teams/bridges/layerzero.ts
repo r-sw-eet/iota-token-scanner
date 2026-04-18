@@ -32,11 +32,11 @@ Gold-standard attestation via LayerZero's own metadata API (\`metadata.layerzero
 
 Plus the human-readable chain page at \`docs.layerzero.network/v2/deployments/chains/iota-l1\` (eid 30423, explicitly describing IOTA L1 as a Move-based deployment "separate from IOTA EVM L2, EID 30284"), and the IOTA-L1 developer overview at \`docs.layerzero.network/v2/developers/iota/overview\`.
 
-On-chain: deployer \`0x8a81…d30a\` publishes 22 packages, all LayerZero V2 components:
+On-chain: deployer \`0x8a81a6096a81fe2b722541bc19eb30e6c025732638375c362f07ea48979fd30a\` publishes 22 packages, all LayerZero V2 components:
 
-- **endpointV2** \`0xb8e0cd76…dcb1735\` — 18 modules: \`endpoint_quote, endpoint_send, endpoint_v2, lz_compose, lz_receive, message_lib_manager, message_lib_quote, message_lib_send, message_lib_set_config, message_lib_type, messaging_channel, messaging_composer, messaging_fee, messaging_receipt, oapp_registry, outbound_packet, timeout, utils\`. Exact match to the API.
-- **sendUln302 / receiveUln302** \`0x042e3bb8…a814499e\` — modules \`executor_config, oapp_uln_config, receive_uln, send_uln, uln_302, uln_config\`. Exact match.
-- **ZRO token** (\`zro\` module): \`0xed5b4c39…f05698\`.
+- **endpointV2** \`0xb8e0cd76cb8916c48c03320e43d46c3775edd6f17ce7fbfad6c751289dcb1735\` — 18 modules: \`endpoint_quote, endpoint_send, endpoint_v2, lz_compose, lz_receive, message_lib_manager, message_lib_quote, message_lib_send, message_lib_set_config, message_lib_type, messaging_channel, messaging_composer, messaging_fee, messaging_receipt, oapp_registry, outbound_packet, timeout, utils\`. Exact match to the API.
+- **sendUln302 / receiveUln302** \`0x042e3bb837e5528e495124542495b9df5016acd011d89838ae529db5a814499e\` — modules \`executor_config, oapp_uln_config, receive_uln, send_uln, uln_302, uln_config\`. Exact match.
+- **ZRO token** (\`zro\` module): \`0xed5b4c39309e0af02a84c27a23ecd3f0d8dc825b2297c2b2e23bfeeac4f05698\`.
 - **Call pattern primitives** (LayerZero's Move-specific IPC): \`call\`, \`call_cap\`, \`multi_call\`, \`argument\`, \`function\`, \`move_call\`, \`move_calls_builder\`.
 - **Workers / DVN / Executor infra:** \`dvn_assign_job\`, \`dvn_get_fee\`, \`dvn_verify\`, \`executor_assign_job\`, \`executor_get_fee\`, \`worker_registry\`, \`worker_common\`, \`worker_info_v1\`, \`fee_recipient\`, \`packet_v1_codec\`, \`worker_options\`.
 - **Message libraries:** \`simple_message_lib\`, \`blocked_message_lib\`.
@@ -45,12 +45,12 @@ On-chain: deployer \`0x8a81…d30a\` publishes 22 packages, all LayerZero V2 com
 - **View packages:** \`endpoint_views\`, \`uln_302_views\`.
 - **Utilities:** \`buffer_reader, buffer_writer, bytes32, hash, package, table_ext\`, \`estimate_fee\`, \`package_whitelist_validator\`.
 
-The executor address \`0x29b691f9…37e99a\` is an operational account, not a package deployer (confirmed via \`packages(…)\` query: zero packages at that address). Consistent with LayerZero's architecture where the Executor is an off-chain worker identity.
+The executor address \`0x29b691f9496eea6df8f4d77ceacee5949e92e7e51b2e3c2e6cd70eef5237e99a\` is an operational account, not a package deployer (confirmed via \`packages(…)\` query: zero packages at that address). Consistent with LayerZero's architecture where the Executor is an off-chain worker identity.
 
 Triangulation:
 - [x] LayerZero's own metadata API names \`iotal1-mainnet\` with eid 30423, chainLayer L1, chainType iotamove.
 - [x] The API publishes 3 addressable components (endpointV2 + sendUln302/receiveUln302 pointing at the same ULN package + executor as an account).
-- [x] On-chain scan confirms 2 of the 3 API-published addresses are at deployer \`0x8a81…d30a\`; the 3rd is an account (non-package).
+- [x] On-chain scan confirms 2 of the 3 API-published addresses are at deployer \`0x8a81a6096a81fe2b722541bc19eb30e6c025732638375c362f07ea48979fd30a\`; the 3rd is an account (non-package).
 - [x] 22 packages total, all LayerZero V2 components with matching module names.
 - [x] Zero off-topic packages; no LayerZero-adjacent modules (\`messagelib\`, \`endpoint\`, \`lz_compose\`) appear at any other deployer on IOTA mainnet.
 

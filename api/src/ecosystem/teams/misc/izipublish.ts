@@ -14,7 +14,7 @@ export const izipublish: Team = {
   ],
   logo: '/logos/izipublish.png',
   attribution: `
-Previously registered as "Easy Publish" based only on the module name. Resolved 2026-04-17 via object-probe: sampled live objects of every struct type declared by the \`easy_publish\` module (Container, DataItem, ContainerChain, DataItemChain, ChainInit, Creator, etc.) across all 5 upgrade versions of the package. Found live usage on the middle version \`0xb0927f14…\`:
+Previously registered as "Easy Publish" based only on the module name. Resolved 2026-04-17 via object-probe: sampled live objects of every struct type declared by the \`easy_publish\` module (Container, DataItem, ContainerChain, DataItemChain, ChainInit, Creator, etc.) across all 5 upgrade versions of the package. Found live usage on the middle version \`0xb0927f142487c66708ec3cf978dbe45da94ccede7944de7a13889efa01f7dc67\`:
 
 - 3 \`Container\` objects (one named "Genesis Container 1")
 - 3 \`DataItem\` objects
@@ -30,7 +30,7 @@ creator.creator_addr: 0x7c33d09b7b6ddbfed32bd945caae96719ae07f68863d8614c4d96d6d
 
 name: Maintenance april 2026
 content: {"easy_publish":{"publish":{"targets":[{"domain":"cars.izipublish.com",...}]}},"cars":{"maintenance":...}}
-creator.creator_addr: 0x7c33d09b…0af429
+creator.creator_addr: 0x7c33d09b7b6ddbfed32bd945caae96719ae07f68863d8614c4d96d6d320af429
 \`\`\`
 
 The domain \`cars.izipublish.com\` resolves to a live IOTA Data Publishing dApp. The parent site \`izipublish.com\` has the page title "IOTA Data Publishing dApp | On-Chain Data & Verification" — confirming the product.
@@ -41,8 +41,8 @@ The domain \`cars.izipublish.com\` resolves to a live IOTA Data Publishing dApp.
 - **Demo (cars.izipublish.com):** car maintenance records — each event a DataItem anchored on-chain with a DataType schema.
 
 **Addresses involved:**
-- **Deployer (Move packages):** \`0x0dce…db97\` — ships the 5 upgrade versions of the framework.
-- **Publisher / container creator:** \`0x7c33d09b…0af429\` — calls the public framework functions to create Containers and publish DataItems.
+- **Deployer (Move packages):** \`0x0dce85b04ae7d67de5c6785f329aac1c429cd9321724d64ba5961d347575db97\` — ships the 5 upgrade versions of the framework.
+- **Publisher / container creator:** \`0x7c33d09b7b6ddbfed32bd945caae96719ae07f68863d8614c4d96d6d320af429\` — calls the public framework functions to create Containers and publish DataItems.
 
 Both serve izipublish: the deployer runs the framework, the publisher creates content.
 

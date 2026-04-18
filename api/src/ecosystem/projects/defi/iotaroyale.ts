@@ -11,6 +11,6 @@ export const iotaroyale: ProjectDefinition = {
   attribution: `
 On-chain evidence: deployer-match rule pinned to IotaRoyale's single deployer. All 5 packages are farming/reward contracts: v1 \`{farm, farm_dual, irt}\`, v2+ \`{farm, farm_dual, farm_yield, irt}\`.
 
-Gold-standard attribution comes from IOTA on-chain metadata itself: \`iotax_getCoinMetadata\` on \`0x95690908…::irt::IRT\` returns \`name: "IotaRoyale Token"\` with an iconUrl pointing at \`iotaroyale.com/logo.png\`. Backed by IotaRoyale's public launch video (YouTube Feb 2026) and GeckoTerminal's "IRT/vIOTA - IotaRoyale Token Price on Pools Finance" pool listing.
+Gold-standard attribution comes from IOTA on-chain metadata itself: \`iotax_getCoinMetadata\` on \`0x95690908e995c79033b9d392680cfb43f39fc344e79a6c6845dc23334bb3ebd2::irt::IRT\` returns \`name: "IotaRoyale Token"\` with an iconUrl pointing at \`iotaroyale.com/logo.png\`. Backed by IotaRoyale's public launch video (YouTube Feb 2026) and GeckoTerminal's "IRT/vIOTA - IotaRoyale Token Price on Pools Finance" pool listing.
 `.trim(),
 };

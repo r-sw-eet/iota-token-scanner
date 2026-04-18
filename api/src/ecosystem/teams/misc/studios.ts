@@ -34,7 +34,7 @@ Not one team with one brand — a dev shop or dApp kit publisher servicing multi
 2. **Dev shop operating multiple clients.** One technical team with several product brands sharing a deployer key.
 3. **Shared IOTA Foundation-adjacent infrastructure.** IOTA Foundation's Ambassador Program uses GiveRep on IOTA; KrillTube may be IF-affiliated; the deployer could be an IF-adjacent contractor.
 
-Evidence leans (1): \`tic_tac_iota::AdminCap\` is owned directly by the deployer \`0xb8b1380e…\`, and Chess/2048 Treasury objects are shared-object-administered by the deployer. That suggests the deployer directly administrates the games (not handed off to other teams). Not conclusive.
+Evidence leans (1): \`tic_tac_iota::AdminCap\` is owned directly by the deployer \`0xb8b1380eb2f879440e6f568edbc3aab46b54c48b8bfe81acbc1b4cf15a2706c6\`, and Chess/2048 Treasury objects are shared-object-administered by the deployer. That suggests the deployer directly administrates the games (not handed off to other teams). Not conclusive.
 `.trim(),
 };
 
@@ -55,7 +55,7 @@ export const studio0a0d: Team = {
   attribution: `
 Previously 🟠 UNVERIFIED and attributed to a synthetic "Studio 0x0a0d4c9a" label. Hard-linked 2026-04-18 via downstream-dependency scan + coin-metadata icon probing.
 
-Scanning all 747 mainnet packages for \`linkage\` pointing at Studio 0a0d packages returned zero external downstream customers — but the reverse direction broke the case. Three \`spec_sale_v2\` packages depend on \`spec_coin\` at a DIFFERENT deployer (\`0x4468c8dd…\`, SPEC-coin-only, 2 packages) — logically the same team using a dedicated token key.
+Scanning all 747 mainnet packages for \`linkage\` pointing at Studio 0a0d packages returned zero external downstream customers — but the reverse direction broke the case. Three \`spec_sale_v2\` packages depend on \`spec_coin\` at a DIFFERENT deployer (\`0x4468c8ddb42728fd1194033c1dd14ffd015f0d81e4b5329ddc11793c989f3f39\`, SPEC-coin-only, 2 packages) — logically the same team using a dedicated token key.
 
 Chain of evidence:
 

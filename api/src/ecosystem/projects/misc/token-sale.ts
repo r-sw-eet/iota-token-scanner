@@ -14,7 +14,7 @@ export const tokenSale: ProjectDefinition = {
   attribution: `
 On-chain evidence: Move package containing at least one of \`spec_sale_multicoin\` or \`spec_sale_v2\`. The two module names correspond to the v1 (multicoin) and v2 iterations of the same launchpad contract; \`module:any\` covers both.
 
-The \`spec_sale_v2\` packages declare a non-stdlib dependency on \`spec_coin\` at deployer \`0x4468c8dd…\` (SPEC-coin-only) — that secondary deployer is now registered on the same \`studio-0a0d\` team. The SPEC coin's CoinMetadata icon URL (\`raw.githubusercontent.com/Moron1337/SPEC/main/Spec.png\`) ties the launchpad to GitHub user Moron1337. The public sale UI at \`buy.spec-coin.cc\` states SPEC was "born in the speculative depths of the #speculations channel on IOTA Discord" with a meme-coin disclaimer.
+The \`spec_sale_v2\` packages declare a non-stdlib dependency on \`spec_coin\` at deployer \`0x4468c8ddb42728fd1194033c1dd14ffd015f0d81e4b5329ddc11793c989f3f39\` (SPEC-coin-only) — that secondary deployer is now registered on the same \`studio-0a0d\` team. The SPEC coin's CoinMetadata icon URL (\`raw.githubusercontent.com/Moron1337/SPEC/main/Spec.png\`) ties the launchpad to GitHub user Moron1337. The public sale UI at \`buy.spec-coin.cc\` states SPEC was "born in the speculative depths of the #speculations channel on IOTA Discord" with a meme-coin disclaimer.
 
 Follow-up (not yet applied): one additional \`spec_packs\` module shipped by Studio 0a0d is uncaptured by this rule (expand \`any\` to include \`spec_packs\` when we next touch this file).
 

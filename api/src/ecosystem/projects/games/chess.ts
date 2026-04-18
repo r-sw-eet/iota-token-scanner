@@ -11,6 +11,6 @@ export const chess: ProjectDefinition = {
   attribution: `
 On-chain evidence: Move package with module \`chess\`.
 
-3 upgrade versions at deployer \`0xb8b1380e…\` (Studio 0xb8b1380e). \`chess::AdminCap\` and Treasury objects are shared-object-administered by the deployer itself (not handed off to third parties), suggesting the deployer directly operates the game. Same deployer that ships Tic-Tac-Toe, 2048, Gift Drop, Vault, plus the KrillTube and GiveRep infrastructure — multi-brand dev-shop pattern. See team attribution for the KrillTube/GiveRep identification.
+3 upgrade versions at deployer \`0xb8b1380eb2f879440e6f568edbc3aab46b54c48b8bfe81acbc1b4cf15a2706c6\` (Studio 0xb8b1380e). \`chess::AdminCap\` and Treasury objects are shared-object-administered by the deployer itself (not handed off to third parties), suggesting the deployer directly operates the game. Same deployer that ships Tic-Tac-Toe, 2048, Gift Drop, Vault, plus the KrillTube and GiveRep infrastructure — multi-brand dev-shop pattern. See team attribution for the KrillTube/GiveRep identification.
 `.trim(),
 };

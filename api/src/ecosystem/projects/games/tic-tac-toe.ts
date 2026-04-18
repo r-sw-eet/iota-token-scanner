@@ -11,6 +11,6 @@ export const ticTacToe: ProjectDefinition = {
   attribution: `
 On-chain evidence: Move package with module \`tic_tac_iota\` (IOTA-flavored pun on the game).
 
-3 upgrade versions at Studio 0xb8b1380e. Package exposes \`AdminCap\`, \`Treasury\`, \`Game\`, and \`Trophy\` structs. \`tic_tac_iota::AdminCap\` is held directly by the deployer address \`0xb8b1380e…\` — strongest single signal in the studio that the deployer itself administrates the games, supporting the single-team-behind-KrillTube/GiveRep/games reading over the dev-shop interpretation.
+3 upgrade versions at Studio 0xb8b1380e. Package exposes \`AdminCap\`, \`Treasury\`, \`Game\`, and \`Trophy\` structs. \`tic_tac_iota::AdminCap\` is held directly by the deployer address \`0xb8b1380eb2f879440e6f568edbc3aab46b54c48b8bfe81acbc1b4cf15a2706c6\` — strongest single signal in the studio that the deployer itself administrates the games, supporting the single-team-behind-KrillTube/GiveRep/games reading over the dev-shop interpretation.
 `.trim(),
 };

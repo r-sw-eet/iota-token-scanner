@@ -14,6 +14,6 @@ export const liquidlink: ProjectDefinition = {
   attribution: `
 Previously registered as "Points System" based on the \`{constant, event, point, profile}\` exact-module-set. Verified as LiquidLink via \`iota.liquidlink.io\`, the product's IOTA-specific subdomain that calls into this deployer's packages.
 
-Match rule switched from the 4-module exact set (which only caught the original v1 packages — 4 of 11) to a deployer-based rule: everything published by LiquidLink's single known deployer. The 11-package footprint covers the original core, two refactored v2 packages with \`{core, events}\`, utility packages, and three profile-with-like variants; all published from \`0xd6a5…34ee\`.
+Match rule switched from the 4-module exact set (which only caught the original v1 packages — 4 of 11) to a deployer-based rule: everything published by LiquidLink's single known deployer. The 11-package footprint covers the original core, two refactored v2 packages with \`{core, events}\`, utility packages, and three profile-with-like variants; all published from \`0xd6a54ff7f851b58c19729c11d210d46fd46d702b9d9caff78747de1914c934ee\`.
 `.trim(),
 };

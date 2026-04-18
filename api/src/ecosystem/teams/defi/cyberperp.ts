@@ -12,7 +12,7 @@ export const cyberperp: Team = {
   deployers: ['0x14effa2d3435b7c462a969db6995003cfd3db97f403ad9dd769d0a36413fc3e0'],
   logo: '/logos/cyberperp.svg',
   attribution: `
-Deployer \`0x14ef…c3e0\` identified as CyberPerp's IOTA L1 deployer via on-chain fingerprint + product match. Its 11 packages include a 4-package 19-module GMX-style perpetuals signature (\`delegates, liquidity_pool, market, price_oracle, pyth, referral, rewards_manager, router_*, trading, trading_calc, utils, vault, vault_type\`), a \`cyb\` single-module coin package (the CYB token literal), a 14-module \`oft_*\` wrapper (LayerZero OFT for bridging CYB cross-chain), and 2 DEX/yield-farm packages + 3 standalone market-only packages.
+Deployer \`0x14effa2d3435b7c462a969db6995003cfd3db97f403ad9dd769d0a36413fc3e0\` identified as CyberPerp's IOTA L1 deployer via on-chain fingerprint + product match. Its 11 packages include a 4-package 19-module GMX-style perpetuals signature (\`delegates, liquidity_pool, market, price_oracle, pyth, referral, rewards_manager, router_*, trading, trading_calc, utils, vault, vault_type\`), a \`cyb\` single-module coin package (the CYB token literal), a 14-module \`oft_*\` wrapper (LayerZero OFT for bridging CYB cross-chain), and 2 DEX/yield-farm packages + 3 standalone market-only packages.
 
 CyberPerp's public site (cyberperp.io, docs.cyberperp.io) markets the product as a GMX-fork perps DEX on IOTA EVM; the IOTA L1 packages are the MoveVM companion (native IOTA derivatives + CYB-token bridging). DefiLlama tracks the L2 EVM deployment separately — the L1 Move row and the L2 EVM row are both genuine and NOT double-counted (layer-specific TVL/volume).
 
