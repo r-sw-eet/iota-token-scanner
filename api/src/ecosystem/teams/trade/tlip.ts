@@ -4,6 +4,7 @@ export const tlip: Team = {
   id: 'tlip',
   name: 'TLIP',
   description: 'Trade and Logistics Information Pipeline — IOTA Foundation × TradeMark East Africa partnership for digital trade documents. Kenya customs deployment is the anchor integration. Ships Move primitives for electronic Bills of Lading, carrier registries, and endorsement chains.',
+  isIotaFoundationFamily: true,
   urls: [
     { label: 'TLIP', href: 'https://tlip.io' },
     { label: 'Wiki', href: 'https://wiki.tlip.io' },

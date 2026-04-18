@@ -18,6 +18,7 @@ export const iotaFoundation: Team = {
   id: 'iota-foundation',
   name: 'IOTA Foundation',
   description: 'IOTA Foundation — owns the chain primitives (system packages 0x2 / 0x3) plus the Identity, Identity Asset Framework, Accreditation Registry, Notarization, and Traceability product lines on IOTA Rebased.',
+  isIotaFoundationFamily: true,
   urls: [{ label: 'IOTA Foundation', href: 'https://www.iota.org' }],
   logo: '/logos/iota.svg',
   deployers: [

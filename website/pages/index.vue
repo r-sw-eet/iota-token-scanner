@@ -20,6 +20,10 @@ const shadeTeamless = ref(true)
 const hideIotaFoundation = ref(true)
 
 function isIotaFoundation(p: any): boolean {
+  // Driven by the team's own `isIotaFoundationFamily` flag (Team interface)
+  // so new IF-adjacent teams opt in without a frontend edit. Fallback to the
+  // legacy `if-*` id convention in case a snapshot predates the flag.
+  if (p?.team?.isIotaFoundationFamily === true) return true
   const id = p?.team?.id || ''
   return id === 'if-core' || id.startsWith('if-')
 }
@@ -582,7 +586,7 @@ const projectTvlChartOptions = {
                     <input v-model="shadeTeamless" type="checkbox" class="accent-scanner-accent" />
                     Shade untagged
                   </label>
-                  <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Hide all IOTA Foundation projects (chain primitives, TLIP, Notarization, Traceability, Testing, Identity)">
+                  <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Hide all IOTA Foundation family projects (chain primitives, Identity stack, Notarization, Asset Framework, Accreditation, Traceability, TLIP, TWIN, Testing)">
                     <input v-model="hideIotaFoundation" type="checkbox" class="accent-scanner-accent" />
                     Hide IOTA Foundation
                   </label>
