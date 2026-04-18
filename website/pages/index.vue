@@ -586,7 +586,7 @@ const projectTvlChartOptions = {
                     <input v-model="shadeTeamless" type="checkbox" class="accent-scanner-accent" />
                     Shade untagged
                   </label>
-                  <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Hide IOTA Foundation's own product rows (chain primitives, Identity stack, Notarization, Asset Framework, Accreditation, Traceability). TLIP, TWIN, and IF Testing stay visible — they're IF-adjacent but not the same entity.">
+                  <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Hide IOTA Foundation's own rows — the consolidated iota-foundation team (Identity, Notarization, Traceability, Asset Framework, Accreditation, chain primitives) and IF's internal test deployments. TLIP (IF × TMEA) and TWIN Foundation (IF-co-founded) stay visible — distinct entities.">
                     <input v-model="hideIotaFoundation" type="checkbox" class="accent-scanner-accent" />
                     Hide IOTA Foundation
                   </label>

@@ -8,13 +8,21 @@ export interface Team {
   /** Mainnet addresses known to publish packages for this team (lowercased on compare). */
   deployers: string[];
   /**
-   * Marks this team as **IOTA Foundation proper** (not IF-adjacent or
-   * IF-partnered). Used by the website's "Hide IOTA Foundation" filter.
-   * Only `iota-foundation` itself sets this; TLIP (IF × TMEA partnership),
-   * TWIN Foundation (IF-co-founded Swiss sibling), and IF Testing stay
-   * visible when the filter is on, because they're distinct entities
-   * whose activity users typically want to see separately from IF's own
-   * product rows.
+   * Marks this team as **IOTA Foundation proper** — IF's own product lines
+   * and internal operations, not IF-partnered or IF-co-founded entities.
+   * Used by the website's "Hide IOTA Foundation" filter.
+   *
+   * True for:
+   *   - `iota-foundation` (consolidated: Identity / Notarization / Traceability
+   *     / Asset Framework / Accreditation / chain primitives)
+   *   - `if-testing` (IF's own internal test deployments — NFT tag vocabulary
+   *     `gas_station_*` / `transfer_test` / `regular_comparison` confirms it)
+   *
+   * False / unset for:
+   *   - `tlip` (IF × TradeMark East Africa partnership — distinct brand,
+   *     separate wiki, separate GitHub org)
+   *   - `twin-foundation` (IF-co-founded Swiss parent foundation — separate
+   *     legal entity, own governance, own product surface)
    */
   isIotaFoundationFamily?: boolean;
   /** Absolute public path to the team ICON (square — e.g. `/logos/virtue.svg`). Used on list rows, team cards, and any small-size rendering. Inherited by every project on this team unless the project overrides via `ProjectDefinition.logo`. */

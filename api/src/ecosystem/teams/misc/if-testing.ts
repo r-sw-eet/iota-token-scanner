@@ -4,6 +4,7 @@ export const ifTesting: Team = {
   id: 'if-testing',
   name: 'IOTA Foundation (Testing)',
   description: 'Internal test deployments — gas station validation, transfer tests, comparison campaigns. Packages share the single-module `nft` pattern with tags like `gas_station_*`, `transfer_test`, `regular_comparison`. Circumstantial attribution — TWIN Foundation involvement is a plausible refinement for some packages (see attribution).',
+  isIotaFoundationFamily: true,
   urls: [{ label: 'IOTA Foundation', href: 'https://www.iota.org' }],
   deployers: [
     '0xb83948c6db006a2d50669ff9fc80eef8a3a958bd3060050865fe9255fa4e5521',
