@@ -270,22 +270,25 @@ async function main() {
     let objectType: string | null = null;
     if (i < PROBE_CAP) {
       // Mirror EcosystemService.fetchFull's two-pass probe: object-based across
-      // every package (heaviest → lightest), then TX-effects fallback for
-      // logic-only packages whose own types are never owned by any object.
+      // every package (heaviest → lightest), then TX-effects fallback when
+      // pass 1 didn't surface identifiers. Pass 1 only short-circuits on idents
+      // — capturing a non-brand-revealing objectType (e.g. a Registry) doesn't
+      // end the search.
       for (const pkg of [...packages].reverse()) {
         const p = await probeIdentityFields(pkg.address);
-        if (p.identifiers.length > 0 || p.objectType) {
+        if (p.objectType && !objectType) objectType = p.objectType;
+        if (p.identifiers.length > 0) {
           identifiers = p.identifiers;
-          objectType = p.objectType;
+          if (p.objectType) objectType = p.objectType;
           break;
         }
       }
-      if (identifiers.length === 0 && !objectType) {
+      if (identifiers.length === 0) {
         for (const pkg of [...packages].reverse()) {
           const p = await probeTxEffects(pkg.address);
-          if (p.identifiers.length > 0 || p.objectType) {
+          if (p.identifiers.length > 0) {
             identifiers = p.identifiers;
-            objectType = p.objectType;
+            if (!objectType && p.objectType) objectType = p.objectType;
             break;
           }
         }

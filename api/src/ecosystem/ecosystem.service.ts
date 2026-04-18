@@ -844,15 +844,20 @@ export class EcosystemService implements OnModuleInit {
       let identifiers: string[] = [];
       let objectType: string | null = null;
       if (i < UNATTRIBUTED_PROBE_CAP) {
-        // Pass 1 — object-based probe across all packages (heaviest → lightest),
-        // short-circuit on the first package that yields anything. The cluster's
-        // `latestPkg` may be a deploy-but-uninstantiated upgrade while an
-        // earlier package owns the objects we can read identity fields from.
+        // Pass 1 — object-based probe across all packages (heaviest → lightest).
+        // Capture the first objectType seen as a fallback signal, but only
+        // short-circuit on identifiers — a probe that returns objectType but
+        // no idents (e.g. an internal Registry/Cap object whose fields are all
+        // addresses) tells us the package owns *something* but doesn't give us
+        // brand information, so we keep looking. The cluster's `latestPkg`
+        // may be a deploy-but-uninstantiated upgrade while an earlier package
+        // owns the objects we can read identity fields from.
         for (const pkg of [...packages].reverse()) {
           const probe = await this.probeIdentityFields(pkg.address);
-          if (probe.identifiers.length > 0 || probe.objectType) {
+          if (probe.objectType && !objectType) objectType = probe.objectType;
+          if (probe.identifiers.length > 0) {
             identifiers = probe.identifiers;
-            objectType = probe.objectType;
+            if (probe.objectType) objectType = probe.objectType;
             break;
           }
         }
@@ -860,13 +865,15 @@ export class EcosystemService implements OnModuleInit {
         // where the package contains stability_pool / borrow_incentive logic
         // but never owns objects of its own types). Reads TX effects to harvest
         // sibling-package types (`vusd::VUSD`, `cert::CERT`, …) as identity
-        // signal. Only runs when pass 1 yielded nothing.
-        if (identifiers.length === 0 && !objectType) {
+        // signal. Runs whenever pass 1 didn't surface identifiers, even if it
+        // captured an objectType — because the objectType alone (e.g. an
+        // internal Registry) usually isn't brand-revealing.
+        if (identifiers.length === 0) {
           for (const pkg of [...packages].reverse()) {
             const probe = await this.probeTxEffects(pkg.address);
-            if (probe.identifiers.length > 0 || probe.objectType) {
+            if (probe.identifiers.length > 0) {
               identifiers = probe.identifiers;
-              objectType = probe.objectType;
+              if (!objectType && probe.objectType) objectType = probe.objectType;
               break;
             }
           }

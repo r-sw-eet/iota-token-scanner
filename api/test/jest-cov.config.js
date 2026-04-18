@@ -20,6 +20,7 @@ module.exports = {
     '!src/main.ts',
     '!src/backfill-senders.ts',
     '!src/scan-unattributed-cli.ts',
+    '!src/scan-other-nets-cli.ts',
     '!src/app.module.ts',
     '!src/**/*.module.ts',
     '!src/**/schemas/**',

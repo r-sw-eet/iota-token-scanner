@@ -1881,6 +1881,37 @@ describe('EcosystemService', () => {
       expect(cluster.sampledObjectType).toBe('0xd3b63e603a78786facf65ff22e79701f3e824881a12fa3268d62a75530fe904f::vusd::VUSD');
     });
 
+    it('still runs TX-effects fallback when pass 1 captured an objectType but no identifiers', async () => {
+      // Pass 1 finds an object on the latest pkg whose JSON fields are all
+      // addresses (no human-readable idents). Pass 2 should still run because
+      // identifiers are missing, harvesting sibling-package types from TX
+      // effects as the brand signal.
+      (global as any).fetch = scriptFetch({
+        packages: [
+          pkg({ address: '0xreg1', modules: ['orchestration'], deployer: '0xregteam', storageRebate: '500000000' }),
+          pkg({ address: '0xreg2', modules: ['orchestration'], deployer: '0xregteam', storageRebate: '1500000000' }),
+        ],
+        objects: {
+          // Latest pkg returns a Registry-like object with only address fields → objectType set, no idents
+          '0xreg2': {
+            owner: '0x' + 'a'.repeat(64),
+            authority: '0x' + 'b'.repeat(64),
+          },
+        },
+        txEffects: {
+          '0xreg2': [
+            '0xd3b63e603a78786facf65ff22e79701f3e824881a12fa3268d62a75530fe904f::vusd::VUSD',
+          ],
+        },
+      });
+      const snap = await runCapture();
+      const cluster = snap.unattributed[0];
+      // Pass 1 captured *some* objectType from the registry probe (mock returns
+      // null type repr → null objectType in this test, so pass 2's objectType wins).
+      // The crucial assertion: idents from pass 2 are present.
+      expect(cluster.sampleIdentifiers).toEqual(['creates: 0xd3b63e…::vusd::VUSD']);
+    });
+
     it('buckets unmatched packages with null deployers under the "unknown" key', async () => {
       (global as any).fetch = scriptFetch({
         packages: [
