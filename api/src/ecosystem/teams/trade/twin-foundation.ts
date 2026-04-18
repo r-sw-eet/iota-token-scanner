@@ -4,7 +4,6 @@ export const twinFoundation: Team = {
   id: 'twin-foundation',
   name: 'TWIN Foundation',
   description: 'TWIN (Trade Worldwide Information Network) — Swiss non-profit foundation for digital trade infrastructure, built on IOTA.',
-  isIotaFoundationFamily: true,
   urls: [
     { label: 'TWIN', href: 'https://www.twin.org' },
     { label: 'Dev docs', href: 'https://twindev.org' },

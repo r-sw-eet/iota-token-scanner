@@ -1,7 +1,7 @@
 import { ProjectDefinition } from '../project.interface';
 
 export const iotaAccreditationRegistry: ProjectDefinition = {
-  name: 'IOTA Accreditation Registry',
+  name: 'Accreditation Registry',
   layer: 'L1',
   category: 'Identity',
   description: 'IOTA Foundation credential-issuer attestation registry. Authorities publish accreditations with structured property-shape vocabulary (name, value, shape); consumers verify credentials against the on-chain registry.',

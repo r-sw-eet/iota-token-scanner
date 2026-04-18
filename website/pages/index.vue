@@ -20,12 +20,12 @@ const shadeTeamless = ref(true)
 const hideIotaFoundation = ref(true)
 
 function isIotaFoundation(p: any): boolean {
-  // Driven by the team's own `isIotaFoundationFamily` flag (Team interface)
-  // so new IF-adjacent teams opt in without a frontend edit. Fallback to the
-  // legacy `if-*` id convention in case a snapshot predates the flag.
-  if (p?.team?.isIotaFoundationFamily === true) return true
-  const id = p?.team?.id || ''
-  return id === 'if-core' || id.startsWith('if-')
+  // Narrow "Hide IOTA Foundation" filter: hides only the team flagged as
+  // IF proper. TLIP (IF × TMEA partnership), TWIN Foundation (IF-co-founded
+  // Swiss sibling), and IF Testing remain visible — they're IF-adjacent
+  // but not the same entity, and users typically want to see that
+  // ecosystem activity even when they hide IF's own product rows.
+  return p?.team?.isIotaFoundationFamily === true
 }
 
 const l1Filtered = computed(() => {
@@ -586,7 +586,7 @@ const projectTvlChartOptions = {
                     <input v-model="shadeTeamless" type="checkbox" class="accent-scanner-accent" />
                     Shade untagged
                   </label>
-                  <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Hide all IOTA Foundation family projects (chain primitives, Identity stack, Notarization, Asset Framework, Accreditation, Traceability, TLIP, TWIN, Testing)">
+                  <label class="flex items-center gap-2 text-xs text-[#a1a1aa] cursor-pointer select-none" title="Hide IOTA Foundation's own product rows (chain primitives, Identity stack, Notarization, Asset Framework, Accreditation, Traceability). TLIP, TWIN, and IF Testing stay visible — they're IF-adjacent but not the same entity.">
                     <input v-model="hideIotaFoundation" type="checkbox" class="accent-scanner-accent" />
                     Hide IOTA Foundation
                   </label>
