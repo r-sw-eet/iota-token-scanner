@@ -1161,6 +1161,34 @@ describe('EcosystemService', () => {
       expect(exact.tvl).toBe(12345);
     });
 
+    it('assigns a DefiLlama protocol\'s TVL to at most one project — multi-project teams do not double-count', async () => {
+      // Regression guard: before this fix, substring matching happily
+      // assigned the same TVL to every project whose name substring-matched
+      // a DefiLlama protocol, so teams with multiple product rows (Virtue
+      // + Virtue Stability Pool; TokenLabs Staking / vIOTA / TLN / Payment)
+      // all carried the same tvl, triple-counting in ecosystem totals.
+      (global as any).fetch = scriptFetch({
+        packages: [
+          // Both match 'Exact' def (mods=['foo','bar']) — but different
+          // package addresses give us two separate project instances only
+          // if we use splitByDeployer. To simulate two projects both name-
+          // matching the same protocol, use Exact + AllRequired with
+          // names that both substring-match 'TestProto'.
+          pkg({ address: '0xa', modules: ['foo', 'bar'] }), // → Exact
+          pkg({ address: '0xb', modules: ['a', 'b'] }),     // → AllRequired
+        ],
+        llama: [
+          // Single protocol that name-substring-matches BOTH project names
+          { name: 'ExactTestProtoAllRequired', tvl: 999, chainTvls: { IOTA: 12345 }, chains: ['IOTA'] },
+        ],
+      });
+      const snap = await runCapture();
+      const tvlHolders = snap.l1.filter((p: any) => p.tvl != null);
+      // Exactly one project should have claimed the TVL.
+      expect(tvlHolders).toHaveLength(1);
+      expect(tvlHolders[0].tvl).toBe(12345);
+    });
+
     it('leaves L1 tvl null when DefiLlama has no IOTA-chain slice for the match', async () => {
       (global as any).fetch = scriptFetch({
         packages: [pkg({ address: '0xaa', modules: ['foo', 'bar'] })],

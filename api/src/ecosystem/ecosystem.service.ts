@@ -146,7 +146,7 @@ export class EcosystemService implements OnModuleInit {
     return packages;
   }
 
-  private async countEvents(emittingModule: string, maxPages = 5000): Promise<{ count: number; capped: boolean }> {
+  private async countEvents(emittingModule: string, maxPages = 10000): Promise<{ count: number; capped: boolean }> {
     let total = 0;
     let cursor: string | null = null;
 
@@ -560,16 +560,29 @@ export class EcosystemService implements OnModuleInit {
         (p.chains || []).some((c: string) => c === 'IOTA' || c === 'IOTA EVM'),
       );
 
-      // Match TVL to existing L1 projects — IOTA-chain slice only, not cross-chain total
+      // Match TVL to existing L1 projects — IOTA-chain slice only, not
+      // cross-chain total. Assign each DefiLlama protocol's TVL to AT MOST
+      // ONE project row (the first substring-match) so multi-product teams
+      // like TokenLabs (Staking / vIOTA / TLN / Payment) or Virtue (Virtue
+      // / Virtue Stability Pool) don't each claim the same protocol's TVL
+      // and double-count it in ecosystem totals.
+      const claimedLlamaSlugs = new Set<string>();
       for (const project of projects) {
-        const match = iotaProtocols.find((p) =>
-          p.name.toLowerCase().includes(project.name.toLowerCase()) ||
-          project.name.toLowerCase().includes(p.name.toLowerCase()),
-        );
-        if (match) project.tvl = match.chainTvls?.['IOTA'] ?? null;
+        const match = iotaProtocols.find((p) => {
+          const slug = p.slug || p.name;
+          if (claimedLlamaSlugs.has(slug)) return false;
+          return (
+            p.name.toLowerCase().includes(project.name.toLowerCase()) ||
+            project.name.toLowerCase().includes(p.name.toLowerCase())
+          );
+        });
+        if (match) {
+          project.tvl = match.chainTvls?.['IOTA'] ?? null;
+          claimedLlamaSlugs.add(match.slug || match.name);
+        }
       }
 
-      // Add L2 EVM projects that aren't already in the L1 list
+      // Add L2 EVM projects that aren't already in the L1 list.
       const existingNames = new Set(projects.map((p) => p.name.toLowerCase()));
       for (const proto of iotaProtocols) {
         const isEvm = (proto.chains || []).includes('IOTA EVM');
