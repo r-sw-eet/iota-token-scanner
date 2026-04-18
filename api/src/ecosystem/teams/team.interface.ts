@@ -14,9 +14,7 @@ export interface Team {
    *
    * True for:
    *   - `iota-foundation` (consolidated: Identity / Notarization / Traceability
-   *     / Asset Framework / Accreditation / chain primitives)
-   *   - `if-testing` (IF's own internal test deployments — NFT tag vocabulary
-   *     `gas_station_*` / `transfer_test` / `regular_comparison` confirms it)
+   *     / Asset Framework / Accreditation / chain primitives / Testing)
    *
    * False / unset for:
    *   - `tlip` (IF × TradeMark East Africa partnership — distinct brand,

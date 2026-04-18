@@ -15,6 +15,6 @@ On-chain evidence: Move package whose module set is exactly \`{nft}\` (a single 
 
 Aggregate bucket — this signature fits the canonical single-module NFT-minting pattern used by 100+ unrelated NFT deployers on IOTA. The name "NFT Collections" is ours, purely descriptive. Each matching package becomes a per-deployer sub-project via \`splitByDeployer: true\`, with the display name enriched at runtime from a sample Move object's \`tag\` / \`name\` / \`collection_name\` field (the NFT's own on-chain label).
 
-Team-deployer routing: if a matching deployer belongs to a known single-project team (currently \`if-testing\`), the sub-project is routed to that team's dedicated project row instead of remaining in the bucket.
+Team-deployer routing: if a matching deployer belongs to a known team that exposes a \`match: {}\` (routing-only) project, the sub-project is routed to that project row instead of remaining in the bucket. Currently used by the \`iota-foundation\` team's \`Testing\` project for IF's internal test deployments.
 `.trim(),
 };

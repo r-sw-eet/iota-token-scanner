@@ -439,27 +439,34 @@ export class EcosystemService implements OnModuleInit {
       let splitDeployer: string | undefined;
       if (def.splitByDeployer) {
         const deployer = pkg.previousTransactionBlock?.sender?.address?.toLowerCase() ?? 'unknown';
-        // Team routing: route aggregate-bucket packages to a team's single
-        // project ONLY when that project has NO synchronous match rule —
-        // i.e. it's a routing-only project like IF Testing, designed to
-        // receive team-deployer-routed packages. A project with its own
-        // match rule (e.g. TWIN's `{all: [verifiable_storage]}`) must never
-        // absorb unrelated packages from a shared deployer; those should
-        // fall through to the aggregate bucket's split-by-deployer branch.
+        // Team routing: route aggregate-bucket packages (NFT Collections) to
+        // a team's "routing-only" project — one that sets `match: {}` to
+        // declare "I exist only to receive team-deployer-routed packages".
+        // Projects with their own match rules (e.g. TWIN's
+        // `{all: [verifiable_storage]}`, or IF's Notarization rule) must
+        // never absorb unrelated packages from a shared deployer; they're
+        // reached via matchProject, not here.
+        //
+        // A team can have many projects and still participate in routing as
+        // long as AT LEAST ONE is routing-only — this lets us put the
+        // IF Testing project on the iota-foundation team without fragmenting
+        // team identity across sub-teams.
         //
         // Iterate every team claiming the deployer because one deployer can
         // belong to multiple teams (e.g. `0x164625aa…` is on both TWIN and
-        // IF Testing). Pick the first team whose single project is
-        // routing-only.
+        // iota-foundation). Pick the first team that exposes a routing-only
+        // project; if none do, the package stays in the aggregate bucket
+        // split by deployer.
         const candidateTeams = ALL_TEAMS.filter((t) =>
           t.deployers.some((d) => d.toLowerCase() === deployer),
         );
         let routed = false;
         for (const team of candidateTeams) {
-          const teamProjects = ALL_PROJECTS.filter((p) => p.teamId === team.id);
-          if (teamProjects.length !== 1) continue;
-          if (hasSyncMatch(teamProjects[0])) continue;
-          def = teamProjects[0];
+          const routingOnly = ALL_PROJECTS.find(
+            (p) => p.teamId === team.id && !hasSyncMatch(p),
+          );
+          if (!routingOnly) continue;
+          def = routingOnly;
           mapKey = def.name;
           routed = true;
           break;

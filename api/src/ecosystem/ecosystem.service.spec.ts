@@ -155,6 +155,24 @@ jest.mock('./projects', () => {
       teamId: 'team-multi',
       match: { all: ['beta'] },
     },
+    {
+      name: 'MultiProjectRouting',
+      layer: 'L1',
+      category: 'Misc',
+      description: 'Routing-only project on team-mixed — the team also has sync-matched projects (below). Exercises the "multi-project team with at least one routing-only target" path introduced when if-testing was merged into iota-foundation.',
+      urls: [],
+      teamId: 'team-mixed',
+      match: {},
+    },
+    {
+      name: 'MixedSyncA',
+      layer: 'L1',
+      category: 'Misc',
+      description: 'Sync-matched project on team-mixed — coexists with MultiProjectRouting on the same team.',
+      urls: [],
+      teamId: 'team-mixed',
+      match: { all: ['mixed_alpha'] },
+    },
   ];
   return { ALL_PROJECTS: projects, ProjectDefinition: undefined };
 });
@@ -164,6 +182,7 @@ jest.mock('./teams', () => {
     { id: 'team-solo', name: 'Solo', deployers: ['0xSOLO'], logo: '/logos/solo.svg' },
     { id: 'team-strict', name: 'Strict', deployers: ['0xSTRICT'] },
     { id: 'team-shared-routing', name: 'Shared Routing', deployers: ['0xSTRICT'] },
+    { id: 'team-mixed', name: 'Mixed', deployers: ['0xMIXED'] },
     { id: 'team-multi', name: 'Multi', deployers: ['0xMULTI'] },
   ];
   return {
@@ -1064,6 +1083,23 @@ describe('EcosystemService', () => {
       const names = snap.l1.map((p: any) => p.name);
       expect(names).toContain('SharedRoutingSolo');
       expect(names).not.toContain('StrictSolo');
+      expect(names.some((n: string) => n.startsWith('Aggregate'))).toBe(false);
+    });
+
+    it('routes splitByDeployer packages to a multi-project team when the team has at least one routing-only project', async () => {
+      // This is the IOTA Foundation / Testing shape introduced when if-testing
+      // was merged into iota-foundation: a team with many sync-matched product
+      // rows PLUS one routing-only project. Packages matching only the
+      // NFT-Collections aggregate (not any of the team's sync rules) must
+      // still route to the routing-only project.
+      (global as any).fetch = scriptFetch({
+        packages: [pkg({ address: '0xnft-mixed', modules: ['nft'], deployer: '0xMIXED' })],
+        objects: {},
+      });
+      const snap = await runCapture();
+      const names = snap.l1.map((p: any) => p.name);
+      expect(names).toContain('MultiProjectRouting');
+      expect(names).not.toContain('MixedSyncA');
       expect(names.some((n: string) => n.startsWith('Aggregate'))).toBe(false);
     });
 
