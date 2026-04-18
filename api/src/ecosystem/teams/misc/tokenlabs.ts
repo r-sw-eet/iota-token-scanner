@@ -12,6 +12,7 @@ export const tokenlabs: Team = {
     '0x9bd84e617831511634d8aca9120e90b07ba9e4fd920029e1fe4c887fc8599841',
     '0x5555679093281ffa85c51c24b55fc45ff0f1bb6a57c0bee2c61eae3d5b54ae7c',
   ],
+  logo: '/logos/tokenlabs.ico',
   attribution: `
 Previously registered as "Staking (generic)" based on the Liquidswap-derived \`{stake, stake_config, stake_entries}\` module signature alone. Attribution was 🟠 UNVERIFIED until 2026-04-17, when a GlobalConfig object probe cracked it in one query.
 

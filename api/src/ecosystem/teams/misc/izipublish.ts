@@ -12,6 +12,7 @@ export const izipublish: Team = {
     '0x0dce85b04ae7d67de5c6785f329aac1c429cd9321724d64ba5961d347575db97',
     '0x7c33d09b7b6ddbfed32bd945caae96719ae07f68863d8614c4d96d6d320af429',
   ],
+  logo: '/logos/izipublish.png',
   attribution: `
 Previously registered as "Easy Publish" based only on the module name. Resolved 2026-04-17 via object-probe: sampled live objects of every struct type declared by the \`easy_publish\` module (Container, DataItem, ContainerChain, DataItemChain, ChainInit, Creator, etc.) across all 5 upgrade versions of the package. Found live usage on the middle version \`0xb0927f14…\`:
 

@@ -10,6 +10,7 @@ export const ifTesting: Team = {
     '0x278f2a12f9cb6f2c54f6f08bad283c3abc588696fadff6cf9dd88fd20019afeb',
     '0x164625aaa09a1504cd37ba25ab98525cf2e15792f06a12dd378a044a0d719abe',
   ],
+  logo: '/logos/iota.ico',
   attribution: `
 Deployers identified by observing the \`tag\` values on NFTs minted from their packages: \`gas_station_*\`, \`transfer_test\`, \`regular_comparison\` — IF-internal test naming, not a branded product. 79 packages total, all single-module \`nft\` with the Salus-shared NFT schema (\`{id, immutable_metadata, tag, metadata, issuer, issuerIdentity, ownerIdentity, network}\`), strongly suggesting IF-operated campaigns validating gas-station flows. Intentionally kept as a separate team (not merged into \`iota-foundation\`) so the NFT-Collections bucket's team-deployer routing still fires.
 
