@@ -9,8 +9,8 @@ export const ticTacToe: ProjectDefinition = {
   teamId: 'studio-b8b1',
   match: { all: ['tic_tac_iota'] },
   attribution: `
-On-chain evidence: Move package with module \`tic_tac_iota\`.
+On-chain evidence: Move package with module \`tic_tac_iota\` (IOTA-flavored pun on the game).
 
-"Tic Tac Toe" is our descriptive label for a package whose module name is an IOTA-flavored pun on the game. Deployed by Studio 0xb8b1380e, the same anonymous studio behind several other on-chain games.
+3 upgrade versions at Studio 0xb8b1380e. Package exposes \`AdminCap\`, \`Treasury\`, \`Game\`, and \`Trophy\` structs. \`tic_tac_iota::AdminCap\` is held directly by the deployer address \`0xb8b1380e…\` — strongest single signal in the studio that the deployer itself administrates the games, supporting the single-team-behind-KrillTube/GiveRep/games reading over the dev-shop interpretation.
 `.trim(),
 };

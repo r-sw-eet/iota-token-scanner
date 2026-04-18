@@ -4,13 +4,15 @@ export const nftLaunchpad: ProjectDefinition = {
   name: 'NFT Launchpad',
   layer: 'L1',
   category: 'NFT',
-  description: 'NFT launch platform on IOTA Rebased with mint box mechanics, pseudorandom minting for fair distribution, and signature-based whitelist verification.',
-  urls: [],
+  description: 'NFT launch platform on IOTA Rebased with mint box mechanics, pseudorandom minting for fair distribution, and signature-based whitelist verification. Tradeport\'s launchpad product — sibling to the core Tradeport marketplace, shipped from the same deployer keys.',
+  urls: [{ label: 'Website', href: 'https://tradeport.xyz' }],
   teamId: 'tradeport',
   match: { all: ['launchpad', 'mint_box'] },
   attribution: `
 On-chain evidence: Move package with both \`launchpad\` and \`mint_box\` modules.
 
-Tradeport ships a companion NFT launchpad product alongside its marketplace. \`mint_box\` is a Tradeport-specific term for their randomized mint mechanic. Attributed to the Tradeport team because the launchpad package shares deployer addresses with the main Tradeport marketplace package — same organization, second product line.
+\`mint_box\` is a Tradeport-specific term for their randomized mint mechanic. The 4-module signature \`{launchpad, mint_box, pseudorandom, signature}\` is the complete NFT Launchpad product surface: pseudorandom minting + signature-based whitelist.
+
+On-chain: 4 packages across both Tradeport deployers match this rule — 3 upgrade versions at \`0x20d6…85f7\` and 1 at \`0xae24…bf1e\`. Kept as its own row (higher priority than the Tradeport deployer-match) so launchpad activity is legible separately from the core marketplace. No other IOTA mainnet deployer ships \`launchpad + mint_box\`.
 `.trim(),
 };

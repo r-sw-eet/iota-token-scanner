@@ -8,6 +8,8 @@ export const salus: ProjectDefinition = {
   urls: [
     { label: 'Platform', href: 'https://salusplatform.com' },
     { label: 'Beta Nexus', href: 'https://nexus-beta.salusplatform.com' },
+    { label: 'IOTA showcase', href: 'https://www.iota.org/learn/showcases/salus' },
+    { label: 'IOTA blog', href: 'https://blog.iota.org/trade-finance-reinvented/' },
   ],
   teamId: 'salus',
   match: {
@@ -21,8 +23,25 @@ export const salus: ProjectDefinition = {
   attribution: `
 On-chain evidence:
 - Primary: package at exact address \`0xf5e4…a90f\`.
-- Fingerprint (for catching upgraded/new Salus packages automatically): a Move object of type \`<pkg>::nft::NFT\` whose \`issuer\` field equals Salus's deployer and whose \`tag\` field equals \`"salus"\`.
+- Fingerprint: Move object of type \`<pkg>::nft::NFT\` whose \`issuer\` field equals Salus's deployer \`0x4876…c34225\` and whose \`tag\` field equals \`"salus"\`.
 
-Salus Platform tokenizes physical commodities (metal ore, raw materials) as Digital Warehouse Receipts on IOTA. The address is hardcoded because Salus publishes discrete product packages; the fingerprint catches future deployments from the same issuer under the same \`tag="salus"\` marker. Confirmed from salusplatform.com, which openly references their IOTA mainnet deployment.
+Strong organization-level + Move-object self-attestation. No single source publishes the specific package address, but the chain of evidence is comprehensive:
+
+- **IOTA Foundation endorsement:** IOTA's Technology Showcase has a dedicated Salus page (\`iota.org/learn/showcases/salus\`) and a feature blog post at \`blog.iota.org/trade-finance-reinvented\`.
+- **Partnership coverage:** Bitget, CoinTrust, ChainCatcher, Blockchain.News, MEXC, and RootData all published launch coverage describing Salus tokenizing DWRs and Bills of Lading as IOTA NFTs for critical-mineral supply chains.
+- **Visual attestation:** Salus publishes images of their on-chain NFTs on X/Twitter; anyone can cross-check a shown NFT's address against the scanner's \`0x4876…c34225\` deployer.
+- **On-chain self-attestation:** every Move object of type \`<pkg>::nft::NFT\` minted by Salus contains \`issuer\` and \`tag\` fields populated with \`0x4876…c34225\` and \`"salus"\` respectively — the contract writes its own identity into each minted token.
+
+Scan of deployer \`0x4876…c34225\` reveals **60 distinct package addresses**, all with a single module named \`nft\`. Unusual pattern: rather than one package upgraded 60 times (which would preserve the original address with version bumps), Salus publishes a *new* package per batch of DWRs. The hardcoded \`packageAddresses\` catches one specific instance; everything else is rescued via the fingerprint rule — textbook case for why the fingerprint primitive exists.
+
+Fingerprint probe verified live — sampled object fields on \`0xf5e4f559…::nft::NFT\`:
+\`\`\`
+id:               0x59e6523564f5d7…
+issuer:           0x4876d3fca2cb61ce39d4f920ad0705f5921995642c69201ee5adfa8f94c34225
+tag:              "salus"
+immutable_metadata, metadata, issuerIdentity, ownerIdentity: (populated)
+\`\`\`
+
+All 60 packages successfully attribute to Salus in the live snapshot. The hardcoded \`packageAddresses\` is technically redundant (fingerprint would catch it) but serves as a canonical pointer and ensures attribution if someone ever queries an NFT-less instance (fingerprint requires a live minted object to probe).
 `.trim(),
 };

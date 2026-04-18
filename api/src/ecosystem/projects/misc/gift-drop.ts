@@ -4,13 +4,13 @@ export const giftDrop: ProjectDefinition = {
   name: 'Gift Drop',
   layer: 'L1',
   category: 'Airdrop',
-  description: 'IOTA gift drop mechanism for distributing tokens to recipients via claimable on-chain vouchers. Used for promotional airdrops and community reward campaigns.',
+  description: 'IOTA gift drop mechanism — claimable on-chain vouchers for distributing tokens to recipients. Used for promotional airdrops and community reward campaigns. Multiple upgrade versions shipped from Studio 0xb8b1380e\'s multi-brand deployer.',
   urls: [],
   teamId: 'studio-b8b1',
   match: { all: ['giftdrop_iota'] },
   attribution: `
-On-chain evidence: Move package with module \`giftdrop_iota\`.
+On-chain evidence: Move package with module \`giftdrop_iota\` (IOTA-flavored module name).
 
-"Gift Drop" is our descriptive label for a claimable-voucher airdrop contract. The module name is literal (IOTA-flavored suffix). Deployed by Studio 0xb8b1380e, the same anonymous studio that ships the games bundle.
+Multiple upgrade versions at Studio 0xb8b1380e — part of the studio's infrastructure-utility portfolio alongside \`vault\` (multiple variants with per-creator VaultManagers) and \`gas_station\`. See team attribution for context: Studio 0xb8b1380e is a multi-brand deployer shipping KrillTube (\`krill.tube\`), GiveRep (\`giverep.com\`, IOTA side), the on-chain games bundle, and shared utility infrastructure.
 `.trim(),
 };

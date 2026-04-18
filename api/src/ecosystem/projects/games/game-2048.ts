@@ -11,6 +11,6 @@ export const game2048: ProjectDefinition = {
   attribution: `
 On-chain evidence: Move package with both \`campaign_rewards\` and \`game_2048\` modules.
 
-"2048 Game" is our descriptive label — \`game_2048\` is the literal module name, and \`campaign_rewards\` indicates the studio added a reward layer on top (score → on-chain points/rewards). Same Studio 0xb8b1380e deployer as the other on-chain games.
+Package exposes a \`RewardCapStore\` object managing campaign payouts. Studio 0xb8b1380e ships this as part of its games portfolio alongside Chess and Tic-Tac-Toe. Treasury objects are shared-object-administered by the deployer — same direct-administration pattern seen across the studio's games. See team attribution for the full KrillTube/GiveRep/games multi-brand picture.
 `.trim(),
 };

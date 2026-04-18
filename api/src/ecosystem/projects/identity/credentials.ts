@@ -4,13 +4,18 @@ export const credentials: ProjectDefinition = {
   name: 'Credentials',
   layer: 'L1',
   category: 'Identity',
-  description: 'Verifiable credentials protocol on IOTA Rebased. Issues, holds, and verifies digital credentials with on-chain trust anchors. Enables portable identity attestations across applications.',
-  urls: [],
+  description: 'Verifiable credentials primitive on IOTA Rebased — issues, holds, and verifies digital credentials with on-chain trust anchors. Portable identity attestations across applications. Exact 3-module {credentials, identity, trust} variant in the IF Identity stack.',
+  urls: [
+    { label: 'IOTA Foundation', href: 'https://www.iota.org/products/identity' },
+    { label: 'GitHub', href: 'https://github.com/iotaledger/identity' },
+  ],
   teamId: 'iota-foundation',
   match: { exact: ['credentials', 'identity', 'trust'] },
   attribution: `
 On-chain evidence: Move package whose module set is exactly \`{credentials, identity, trust}\`.
 
-Part of the IOTA Foundation identity stack. The three-module exact-set signature differentiates it from the broader Identity (full) package. "Credentials" is our descriptive name; the IF identity team doesn't market this as a standalone product separately from their other identity offerings. Routed to the consolidated \`iota-foundation\` team.
+2 of the 24 IOTA Identity packages at IF deployer \`0x4574…408f\` match this exact signature. Exact-set match differentiates it cleanly from the broader Identity (full) package (5 modules) and the specialized health-lab credential variant (\`{credentials, health_lab_simple, identity, trust}\` — 4 modules, currently uncaptured low-priority gap).
+
+Same \`iota-foundation\` team as the rest of the Identity stack. Attested at the canonical IF repo \`github.com/iotaledger/identity\` ("Decentralized Identity standards such as DID and Verifiable Credentials by W3C for the IOTA MoveVM") — the W3C Verifiable Credentials implementation is the "Credentials" row of that product line.
 `.trim(),
 };

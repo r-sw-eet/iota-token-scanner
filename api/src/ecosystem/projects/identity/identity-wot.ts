@@ -4,13 +4,22 @@ export const identityWot: ProjectDefinition = {
   name: 'Identity (WoT)',
   layer: 'L1',
   category: 'Identity',
-  description: 'Web of Trust identity system on IOTA Rebased. Enables decentralized identity verification where trust relationships between entities are recorded on-chain, forming a verifiable trust graph.',
-  urls: [],
+  description: 'Web of Trust variant of IOTA Identity. Decentralized identity verification where trust relationships between entities are recorded on-chain, forming a verifiable trust graph. Lighter than the full-stack Identity deployment — no file vault, no mailbox.',
+  urls: [
+    { label: 'IOTA Foundation', href: 'https://www.iota.org/products/identity' },
+    { label: 'GitHub', href: 'https://github.com/iotaledger/identity' },
+  ],
   teamId: 'iota-foundation',
   match: { all: ['wot_identity', 'wot_trust'] },
   attribution: `
-On-chain evidence: Move package with both \`wot_identity\` and \`wot_trust\` modules (and not the \`file_vault\` / \`mailbox\` of the full deployment — the registry's match order in ALL_PROJECTS puts \`identityFull\` first, so this rule only fires when the fuller signature doesn't match).
+On-chain evidence: Move package with both \`wot_identity\` and \`wot_trust\` modules.
 
-Lighter IF identity deployment — WoT-only, without the file vault / mailbox add-ons. "Identity (WoT)" is our disambiguator. Same IOTA Foundation team.
+Catches 20 of the 24 IOTA Identity packages at IF deployer \`0x4574…408f\` — everything containing both \`wot_identity\` + \`wot_trust\`:
+- WoT-basic \`{wot_identity, wot_trust}\` — 6 upgrade versions.
+- WoT + identity_registry \`{identity_registry, wot_identity, wot_trust}\` — 4 versions.
+- WoT + wot_identity_registry \`{wot_identity, wot_identity_registry, wot_trust}\` — 4 versions.
+- WoT + mailbox \`{mailbox, wot_identity, wot_identity_registry, wot_trust}\` — 6 versions.
+
+Priority in \`ALL_PROJECTS\` puts \`identityFull\` first, so this rule only fires when the 3-module full-stack signature (\`{wot_identity, file_vault, mailbox}\`) doesn't match. Same \`iota-foundation\` team, same deployer. Attested at the canonical IF repo \`github.com/iotaledger/identity\` ("Decentralized Identity standards … DID and Verifiable Credentials by W3C for the IOTA MoveVM").
 `.trim(),
 };
